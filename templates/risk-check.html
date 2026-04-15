@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORVIA - Risk Assessment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #b22222;
+            --primary-red-dark: #8b1a1a;
+            --pastel-red: #fff0f0;
+            --white: #ffffff;
+            --text-dark: #1a0a0a;
+            --text-mid: #5f3d3d;
+            --border: rgba(178,34,34,0.13);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--white);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* ── HEADER ── */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 5%;
+            background: var(--pastel-red);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-wrap { display: flex; align-items: center; text-decoration: none; }
+
+        .logo-img {
+            height: 70px;
+            width: auto;
+            display: block;
+            mix-blend-mode: multiply;
+        }
+
+        nav ul { display: flex; list-style: none; gap: 32px; }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-mid);
+            font-weight: 500;
+            font-size: 15px;
+            transition: color 0.25s;
+            position: relative;
+        }
+
+        nav a:hover, nav a.active { color: var(--primary-red); }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px; left: 0;
+            width: 100%; height: 2px;
+            background: var(--primary-red);
+            border-radius: 2px;
+        }
+
+        /* ── PAGE HERO ── */
+        .page-hero {
+            background: linear-gradient(145deg, #fff8f8 0%, #ffeded 55%, #ffe0e0 100%);
+            padding: 52px 5% 44px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(178,34,34,0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .page-hero-label {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--primary-red);
+            margin-bottom: 16px;
+            padding: 5px 16px;
+            border: 1px solid rgba(178,34,34,0.25);
+            border-radius: 50px;
+        }
+
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800;
+            color: var(--text-dark);
+            line-height: 1.15;
+            margin-bottom: 14px;
+        }
+
+        .page-hero h1 span { color: var(--primary-red); font-style: italic; }
+
+        .page-hero p {
+            font-size: 1rem;
+            color: var(--text-mid);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* ── ASSESSMENT SECTION ── */
+        .assessment-section {
+            padding: 56px 4% 72px;
+            background: var(--white);
+        }
+
+        .assessment-wrap {
+            max-width: 1260px;
+            margin: 0 auto;
+        }
+
+        /* ── SIDE BY SIDE CARDS ROW ── */
+        .cards-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 28px;
+            align-items: start;
+            margin-bottom: 36px;
+        }
+
+        /* ── CARD ── */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 32px 28px;
+            box-shadow: 0 8px 32px rgba(178,34,34,0.07);
+            animation: fadeUp 0.8s ease both;
+        }
+
+        .card.clinical { animation-delay: 0.08s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(22px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(178,34,34,0.1);
+        }
+
+        .card-icon {
+            width: 42px; height: 42px;
+            background: rgba(178,34,34,0.08);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            flex-shrink: 0;
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 2px;
+        }
+
+        .card-sub {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+        }
+
+        /* ── FORM ── */
+        .form-group { margin-bottom: 16px; }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            margin-bottom: 5px;
+            letter-spacing: 0.2px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 9px 13px;
+            border: 1.5px solid rgba(178,34,34,0.18);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.88rem;
+            color: var(--text-dark);
+            background: #fffafa;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(178,34,34,0.08);
+            background: var(--white);
+        }
+
+        .form-control::placeholder { color: #c4a0a0; }
+
+        select.form-control {
+            appearance: none;
+            cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23b22222' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 13px center;
+            padding-right: 34px;
+        }
+
+        .bp-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+        /* Two-col grid inside cards */
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+
+        .span-full { grid-column: 1 / -1; }
+
+        /* ══════════════════════════════════
+           CHOLESTEROL INPUT BLOCK (new)
+        ══════════════════════════════════ */
+        .chol-block {
+            grid-column: 1 / -1;
+            border: 1.5px solid rgba(178,34,34,0.18);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        /* Header row: label + mode toggle */
+        .chol-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            background: rgba(178,34,34,0.04);
+            border-bottom: 1px solid rgba(178,34,34,0.1);
+        }
+
+        .chol-header-label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            letter-spacing: 0.2px;
+        }
+
+        /* Pill toggle: Enter Values / Age Estimate */
+        .chol-toggle {
+            display: flex;
+            background: rgba(178,34,34,0.08);
+            border-radius: 20px;
+            padding: 3px;
+            gap: 2px;
+        }
+
+        .chol-toggle-opt {
+            padding: 4px 14px;
+            border-radius: 16px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-mid);
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .chol-toggle-opt.active {
+            background: var(--primary-red);
+            color: var(--white);
+            box-shadow: 0 2px 8px rgba(178,34,34,0.25);
+        }
+
+        /* Input fields row */
+        .chol-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .chol-field {
+            padding: 14px 16px;
+        }
+
+        .chol-field:first-child {
+            border-right: 1px solid rgba(178,34,34,0.1);
+        }
+
+        .chol-field-label {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            margin-bottom: 7px;
+            letter-spacing: 0.2px;
+            display: block;
+        }
+
+        .chol-field input {
+            width: 100%;
+            padding: 9px 13px;
+            border: 1.5px solid rgba(178,34,34,0.18);
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            background: #fffafa;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .chol-field input:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(178,34,34,0.08);
+            background: var(--white);
+        }
+
+        .chol-field input::placeholder { color: #c4a0a0; }
+
+        /* Estimate note shown below inputs */
+        .chol-estimate-note {
+            display: none;
+            padding: 9px 16px 12px;
+            font-size: 0.74rem;
+            color: var(--text-mid);
+            background: rgba(178,34,34,0.03);
+            border-top: 1px solid rgba(178,34,34,0.08);
+            line-height: 1.6;
+        }
+
+        .chol-estimate-note strong { color: var(--primary-red); }
+
+        /* ── CSV DROP ZONE ── */
+        .csv-zone {
+            border: 2px dashed rgba(178,34,34,0.28);
+            border-radius: 14px;
+            padding: 30px 16px;
+            text-align: center;
+            background: rgba(178,34,34,0.02);
+            cursor: pointer;
+            transition: border-color 0.25s, background 0.25s;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .csv-zone:hover, .csv-zone.drag-over {
+            border-color: var(--primary-red);
+            background: rgba(178,34,34,0.05);
+        }
+
+        .csv-zone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .csv-icon { font-size: 2rem; margin-bottom: 10px; display: block; }
+
+        .drop-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .drop-sub {
+            font-size: 0.77rem;
+            color: var(--text-mid);
+            line-height: 1.6;
+        }
+
+        .drop-sub span { color: var(--primary-red); font-weight: 600; }
+
+        .csv-success {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: rgba(34,139,34,0.07);
+            border: 1px solid rgba(34,139,34,0.2);
+            border-radius: 10px;
+            padding: 9px 13px;
+            margin-bottom: 18px;
+            font-size: 0.82rem;
+            color: #1a5c1a;
+            font-weight: 500;
+        }
+
+        .csv-success.visible { display: flex; }
+
+        .section-divider {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--primary-red);
+            opacity: 0.75;
+            margin: 18px 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(178,34,34,0.15);
+        }
+
+        .or-divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 18px;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .or-divider::before, .or-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(178,34,34,0.14);
+        }
+
+        /* Clinical note */
+        .clinical-note {
+            font-size: 0.76rem;
+            color: var(--text-mid);
+            margin-top: 10px;
+            line-height: 1.6;
+            padding: 11px 13px;
+            background: rgba(178,34,34,0.04);
+            border-radius: 10px;
+            border-left: 3px solid rgba(178,34,34,0.2);
+        }
+
+        /* ── SUBMIT ── */
+        .submit-wrap {
+            text-align: center;
+            animation: fadeUp 0.8s 0.18s ease both;
+        }
+
+        .submit-desc {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+
+        .submit-desc strong { color: var(--primary-red); }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 38px;
+            border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-red);
+            color: var(--white);
+            box-shadow: 0 4px 20px rgba(178,34,34,0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(178,34,34,0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-red);
+            border: 2px solid var(--primary-red);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .btn-lg { padding: 16px 52px; font-size: 16px; }
+
+        /* ── RESULTS ── */
+        .results-card {
+            display: none;
+            background: linear-gradient(135deg, #fff8f8 0%, #ffeded 100%);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 48px 40px;
+            text-align: center;
+            box-shadow: 0 12px 40px rgba(178,34,34,0.1);
+            margin-top: 32px;
+            animation: fadeUp 0.6s ease both;
+        }
+
+        .results-card.visible { display: block; }
+
+        .result-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--primary-red);
+            margin-bottom: 14px;
+            opacity: 0.8;
+        }
+
+        .result-number {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(4rem, 8vw, 6.5rem);
+            font-weight: 800;
+            color: var(--primary-red);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+
+        .result-category {
+            display: inline-block;
+            padding: 7px 22px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+            background: rgba(178,34,34,0.1);
+            color: var(--primary-red);
+            border: 1px solid rgba(178,34,34,0.2);
+        }
+
+        .result-modifier {
+            font-size: 0.95rem;
+            color: var(--text-mid);
+            margin-bottom: 32px;
+            line-height: 1.7;
+            max-width: 560px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .result-modifier strong { color: var(--primary-red); }
+
+        .recommendations-box {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px 26px;
+            text-align: left;
+            margin: 0 auto 28px;
+            max-width: 580px;
+        }
+
+        .recommendations-box h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 14px;
+        }
+
+        .recommendations-box ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+
+        .recommendations-box ul li {
+            font-size: 0.875rem;
+            color: var(--text-mid);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .recommendations-box ul li::before {
+            content: '→';
+            color: var(--primary-red);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .result-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+        /* Graph containers */
+        .graph-container {
+            margin: 32px 0 24px;
+            padding: 20px;
+            background: var(--white);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .graph-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 16px;
+            text-align: left;
+            border-left: 3px solid var(--primary-red);
+            padding-left: 12px;
+        }
+
+        .graph-sub {
+            font-size: 0.7rem;
+            color: var(--text-mid);
+            margin-top: 12px;
+            text-align: center;
+            font-style: italic;
+        }
+
+        .drivers-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .driver-card {
+            text-align: center;
+            flex: 1;
+            min-width: 80px;
+            padding: 12px;
+            background: rgba(178,34,34,0.04);
+            border-radius: 12px;
+        }
+
+        .driver-percent {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary-red);
+        }
+
+        .driver-label {
+            font-size: 0.7rem;
+            color: var(--text-mid);
+            margin-top: 4px;
+        }
+
+        .comparison-bar {
+            height: 40px;
+            display: flex;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comp-your {
+            background: var(--primary-red);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .comp-peer {
+            background: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding-left: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        /* ── GOOGLE FIT GUIDE ── */
+        .guide-wrap {
+            margin-bottom: 20px;
+            border: 1px solid rgba(178,34,34,0.15);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .guide-toggle {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 16px;
+            background: rgba(178,34,34,0.04);
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary-red);
+            text-align: left;
+            transition: background 0.2s;
+        }
+
+        .guide-toggle:hover { background: rgba(178,34,34,0.08); }
+        .guide-toggle-icon { font-size: 1rem; flex-shrink: 0; }
+
+        .guide-chevron {
+            margin-left: auto;
+            font-size: 0.85rem;
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .guide-chevron.open { transform: rotate(180deg); }
+
+        .guide-steps {
+            display: none;
+            padding: 16px 16px 14px;
+            border-top: 1px solid rgba(178,34,34,0.1);
+            background: var(--white);
+        }
+
+        .guide-steps.open { display: block; }
+
+        .guide-intro {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+            margin-bottom: 14px;
+            line-height: 1.6;
+        }
+
+        .steps-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .steps-list li { display: flex; align-items: flex-start; gap: 12px; }
+
+        .step-num {
+            width: 22px; height: 22px;
+            background: var(--primary-red);
+            color: white; border-radius: 50%;
+            font-size: 0.68rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0; margin-top: 1px;
+        }
+
+        .step-content { display: flex; flex-direction: column; gap: 2px; }
+
+        .step-title { font-size: 0.82rem; font-weight: 600; color: var(--text-dark); line-height: 1.3; }
+
+        .step-desc { font-size: 0.76rem; color: var(--text-mid); line-height: 1.55; }
+        .step-desc strong { color: var(--text-dark); }
+        .step-desc em { color: var(--primary-red); font-style: normal; font-weight: 500; }
+
+        .guide-tip {
+            font-size: 0.74rem; color: var(--text-mid);
+            background: rgba(178,34,34,0.04);
+            border-left: 3px solid rgba(178,34,34,0.25);
+            padding: 8px 12px;
+            border-radius: 0 8px 8px 0;
+            line-height: 1.55;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 960px) { .cards-row { grid-template-columns: 1fr; } }
+
+        @media (max-width: 600px) {
+            nav ul { gap: 18px; }
+            nav a { font-size: 13px; }
+            .logo-img { height: 54px; }
+            .card { padding: 22px 16px; }
+            .two-col { grid-template-columns: 1fr; }
+            .bp-group { grid-template-columns: 1fr; }
+            .chol-inputs { grid-template-columns: 1fr; }
+            .chol-field:first-child { border-right: none; border-bottom: 1px solid rgba(178,34,34,0.1); }
+            .drivers-grid { flex-direction: column; align-items: center; }
+        }
+    </style>
+</head>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<body>
+
+    <!-- ── HEADER ── -->
+    <header>
+        <a href="mission.html" class="logo-wrap">
+            <img src="{{ url_for('static', filename='FYP Logo (1).png') }}" alt="CORVIA" class="logo-img">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="mission.html">Mission</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="risk-check.html" class="active">Risk Check</a></li>
+                <li><a href="my-report.html">My Report</a></li>
+                <li><a href="find-hospital.html">Find Hospital</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ── PAGE HERO ── -->
+    <div class="page-hero">
+        <div class="page-hero-label">What Your Heart Has Been Whispering</div>
+        <h1>Where Will Your Heart<span> Be in a Decade?</span></h1>
+        <p>Your lab results. Your daily steps. One clear answer.<br>
+            CORVIA brings together 70 years of AHA science and your Google Fit journey to reveal what your heart truly faces.</p>
+    </div>
+
+    <!-- ── ASSESSMENT ── -->
+    <section class="assessment-section">
+        <div class="assessment-wrap">
+
+            <div class="cards-row">
+
+                <!-- ── CLINICAL PARAMETERS ── -->
+                <div class="card clinical">
+                    <div class="card-header">
+                        <div class="card-icon">🩺</div>
+                        <div>
+                            <div class="card-title">Clinical Parameters</div>
+                            <div class="card-sub">From your most recent health check-up or lab results</div>
+                        </div>
+                    </div>
+
+                    <div class="two-col">
+                        <div class="form-group">
+                            <label>Age</label>
+                            <input type="number" class="form-control" placeholder="e.g. 45" id="age" min="18" max="79" oninput="checkAgeRange()">
+                        </div>
+                        <div id="ageWarning" style="display:none; background:#e8f5e9; border:1px solid #2e8b2e; border-radius:10px; padding:12px 15px; margin-top:10px; font-size:0.85rem;">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <div>
+                                    <strong style="color:#2e8b2e;" id="ageWarningTitle">Great news!</strong>
+                                    <p style="color:#5f3d3d; margin-top:4px;" id="ageWarningText">Our model is validated for ages 30-79. Since you're under 30, your heart risk is naturally very low. Focus on building healthy habits - regular exercise, balanced diet, and avoid smoking - to keep it that way.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Name</label>
+                            <input type="text" id="patientName" placeholder="e.g. John Smith" class="form-control">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Sex</label>
+                            <select class="form-control" id="sex">
+                                <option value="">Select sex</option>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                            </select>
+                        </div>
+
+                        <!-- ══ CHOLESTEROL BLOCK — new design matching sketch ══ -->
+                        <div class="chol-block span-full">
+
+                            <!-- Header: label + toggle -->
+                            <div class="chol-header">
+                                <span class="chol-header-label">Cholesterol Input</span>
+                                <div class="chol-toggle">
+                                    <button class="chol-toggle-opt active" id="optEnter" onclick="setCholMode('enter')">Enter Values</button>
+                                    <button class="chol-toggle-opt" id="optEstimate" onclick="setCholMode('estimate')">Age Estimate</button>
+                                </div>
+                            </div>
+
+                            <!-- Two input boxes side by side -->
+                            <div class="chol-inputs">
+                                <div class="chol-field">
+                                    <span class="chol-field-label">Total Cholesterol (mg/dL)</span>
+                                    <input type="number" id="totalCholesterol" placeholder="e.g. 200">
+                                </div>
+                                <div class="chol-field">
+                                    <span class="chol-field-label">HDL Cholesterol (mg/dL)</span>
+                                    <input type="number" id="hdlCholesterol" placeholder="e.g. 50">
+                                </div>
+                            </div>
+
+                            <!-- Estimate note (shown when age-estimate mode active) -->
+                            <div class="chol-estimate-note" id="cholEstimateNote"></div>
+
+                        </div>
+                        <!-- end chol block -->
+
+                        <div class="form-group span-full">
+                            <label>Blood Pressure (mmHg)</label>
+                            <div class="bp-group">
+                                <input type="number" class="form-control" placeholder="Systolic" id="systolic">
+                                <input type="number" class="form-control" placeholder="Diastolic" id="diastolic">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>BP Medication?</label>
+                            <select class="form-control" id="bpMedication">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Diabetes</label>
+                            <select class="form-control" id="diabetes">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group span-full">
+                            <label>Smoking Status</label>
+                            <select class="form-control" id="smoking">
+                                <option value="0">Non-smoker</option>
+                                <option value="1">Current smoker</option>
+                                <option value="0.5">Former smoker</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <p class="clinical-note">💡 Values are used solely to compute your heart risk score. No data is stored without your consent.</p>
+                </div>
+
+                <!-- ── LIFESTYLE ACTIVITY DATA ── -->
+                <div class="card lifestyle">
+                    <div class="card-header">
+                        <div class="card-icon">🏃</div>
+                        <div>
+                            <div class="card-title">Lifestyle Activity Data</div>
+                            <div class="card-sub">Upload your Google Fit CSV export or enter values manually</div>
+                        </div>
+                    </div>
+
+                    <!-- HOW TO GET CSV GUIDE -->
+                    <div class="guide-wrap">
+                        <button class="guide-toggle" onclick="toggleGuide()" id="guideToggle">
+                            <span class="guide-toggle-icon">📋</span>
+                            <span>How to export your Google Fit CSV</span>
+                            <span class="guide-chevron" id="guideChevron">▾</span>
+                        </button>
+
+                        <div class="guide-steps" id="guideSteps">
+                            <div class="guide-intro">Follow these steps to download your Daily Activity Metrics from Google Fit.</div>
+                            <ol class="steps-list">
+                                <li>
+                                    <span class="step-num">1</span>
+                                    <div class="step-content">
+                                        <span class="step-title">Open Google Fit app</span>
+                                        <span class="step-desc">Tap your <strong>profile picture</strong> in the top right corner</span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="step-num">2</span>
+                                    <div class="step-content">
+                                        <span class="step-title">Go to Data &amp; Privacy</span>
+                                        <span class="step-desc">Tap <strong>Fit data and privacy</strong> → <strong>Fit data permissions</strong><br>Enable <em>Store vitals data</em> &amp; <em>Store cycle tracking data</em></span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="step-num">3</span>
+                                    <div class="step-content">
+                                        <span class="step-title">Export your data</span>
+                                        <span class="step-desc">Scroll up to <strong>Your Fit data</strong> → tap <strong>Export your data</strong></span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="step-num">4</span>
+                                    <div class="step-content">
+                                        <span class="step-title">Configure the export</span>
+                                        <span class="step-desc">Select <strong>Fit</strong> → tap <strong>Next step</strong><br>Transfer: <em>Send download link via email</em> · Frequency: <em>Export once</em> · File type: <em>ZIP</em></span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="step-num">5</span>
+                                    <div class="step-content">
+                                        <span class="step-title">Create &amp; download</span>
+                                        <span class="step-desc">Tap <strong>Create export</strong> → Your report will arrive in 10 minutes - check your inbox → tap <strong>Manage Google Takeout request</strong> → <strong>Download</strong></span>
+                                    </div>
+                                </li>
+                                <li>
+                                    <span class="step-num">6</span>
+                                    <div class="step-content">
+                                        <span class="step-title">Find the CSV file</span>
+                                        <span class="step-desc">Open the <strong>Takeout ZIP</strong> → <strong>Fit</strong> folder → <strong>Daily activity metrics</strong> folder → select <strong>Daily activity metrics.csv</strong></span>
+                                    </div>
+                                </li>
+                            </ol>
+                            <div class="guide-tip">💡 The CSV contains all your step, speed, calories and heart data - CORVIA reads it automatically.</div>
+                        </div>
+                    </div>
+
+                    <!-- CSV DROP ZONE -->
+                    <div class="csv-zone" id="csvZone">
+                        <input type="file" id="csvFile" accept=".csv" onchange="handleCSV(this)">
+                        <span class="csv-icon">📂</span>
+                        <div class="drop-title">Drop your Daily Activity Metrics CSV here</div>
+                        <div class="drop-sub">Drag & drop or <span>click to browse</span></div>
+                    </div>
+
+                    <div class="csv-success" id="csvSuccess">
+                        <span>✅</span>
+                        <span id="csvFileName">file.csv uploaded - fields auto-filled below.</span>
+                    </div>
+
+                    <div class="or-divider">or enter manually</div>
+
+                    <div class="section-divider">Activity Metrics</div>
+                    <div class="two-col">
+                        <div class="form-group">
+                            <label>Daily Steps</label>
+                            <input type="number" class="form-control" placeholder="e.g. 8000" id="steps">
+                        </div>
+                        <div class="form-group">
+                            <label>Move Minutes / Day</label>
+                            <input type="number" class="form-control" placeholder="e.g. 45" id="moveMinutes">
+                        </div>
+                        <div class="form-group">
+                            <label>Calories (kcal) / Day</label>
+                            <input type="number" class="form-control" placeholder="e.g. 2200" id="calories">
+                        </div>
+                        <div class="form-group">
+                            <label>Distance (m) / Day</label>
+                            <input type="number" class="form-control" placeholder="e.g. 6000" id="distance">
+                        </div>
+                        <div class="form-group">
+                            <label>Heart Points / Day</label>
+                            <input type="number" class="form-control" placeholder="e.g. 30" id="heartPoints">
+                        </div>
+                        <div class="form-group">
+                            <label>Heart Minutes / Day</label>
+                            <input type="number" class="form-control" placeholder="e.g. 25" id="heartMinutes">
+                        </div>
+                    </div>
+
+                    <div class="section-divider">Speed &amp; Weight</div>
+                    <div class="two-col">
+                        <div class="form-group">
+                            <label>Avg Speed (m/s)</label>
+                            <input type="number" step="0.01" class="form-control" placeholder="e.g. 1.3" id="avgSpeed">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Speed (m/s)</label>
+                            <input type="number" step="0.01" class="form-control" placeholder="e.g. 2.8" id="maxSpeed">
+                        </div>
+                        <div class="form-group">
+                            <label>Min Speed (m/s)</label>
+                            <input type="number" step="0.01" class="form-control" placeholder="e.g. 0.4" id="minSpeed">
+                        </div>
+                        <div class="form-group">
+                            <label>Walking Duration (ms)</label>
+                            <input type="number" class="form-control" placeholder="e.g. 3600000" id="walkingDuration">
+                        </div>
+                        <div class="form-group">
+                            <label>Avg Weight (kg)</label>
+                            <input type="number" step="0.1" class="form-control" placeholder="e.g. 70.0" id="avgWeight">
+                        </div>
+                        <div class="form-group">
+                            <label>Max Weight (kg)</label>
+                            <input type="number" step="0.1" class="form-control" placeholder="e.g. 72.5" id="maxWeight">
+                        </div>
+                        <div class="form-group span-full">
+                            <label>Min Weight (kg)</label>
+                            <input type="number" step="0.1" class="form-control" placeholder="e.g. 68.0" id="minWeight">
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <!-- end cards-row -->
+
+            <!-- ══ SUBMIT ══ -->
+            <div class="submit-wrap">
+                <p class="submit-desc">
+                    CORVIA will combine your clinical data with your activity profile to generate a<br>
+                    <strong>personalised 10-year cardiovascular risk prediction</strong>
+                </p>
+                <button class="btn btn-primary btn-lg" id="calculateBtn" onclick="calculateRisk()">
+                    Calculate My Risk →
+                </button>
+            </div>
+
+            <!-- ══ RESULTS ══ -->
+            <div class="results-card" id="resultsCard">
+
+                <div style="display:grid;grid-template-columns:1fr auto;gap:2rem;align-items:center;margin-bottom:1.5rem;">
+                    <div style="text-align:left">
+                        <div class="result-label">Your 10-Year Cardiovascular Risk</div>
+                        <div class="result-number" id="riskPercentage">—</div>
+                        <div class="result-category" id="riskCategory">—</div>
+                        <p class="result-modifier" id="lifestyleImpact"></p>
+                    </div>
+                    <div style="position:relative;text-align:center;">
+                        <canvas id="riskGauge" width="220" height="130"></canvas>
+                        <div style="position:absolute;bottom:4px;left:50%;transform:translateX(-50%);font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:800;color:#b22222;" id="gaugePct">—</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:1.8rem;">
+                    <div style="display:flex;justify-content:space-between;font-size:0.7rem;color:#5f3d3d;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;margin-bottom:6px;">
+                        <span>Lower risk</span><span>Higher risk</span>
+                    </div>
+                    <div style="display:flex;border-radius:10px;overflow:hidden;height:40px;border:1px solid rgba(178,34,34,0.15);">
+                        <div id="ahaLow"   style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#28a745;color:#e8f5e9;font-size:0.7rem;font-weight:600;opacity:0.35;transition:all 0.4s;"><span>Low</span><small style="font-size:0.58rem;">&lt;5%</small></div>
+                        <div id="ahaBord"  style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#ffc107;color:#856404;font-size:0.7rem;font-weight:600;opacity:0.35;transition:all 0.4s;"><span>Borderline</span><small style="font-size:0.58rem;">5–7.5%</small></div>
+                        <div id="ahaInter" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fd7e14;color:#fff3e0;font-size:0.7rem;font-weight:600;opacity:0.35;transition:all 0.4s;"><span>Intermediate</span><small style="font-size:0.58rem;">7.5–20%</small></div>
+                        <div id="ahaHigh"  style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#dc3545;color:#ffebee;font-size:0.7rem;font-weight:600;opacity:0.35;transition:all 0.4s;"><span>High</span><small style="font-size:0.58rem;">≥20%</small></div>
+                    </div>
+                </div>
+
+                <!-- Your Risk vs. Population Baseline Graph -->
+                <div class="graph-container" id="comparisonGraph" style="display:none;">
+                    <div class="graph-title">Your Risk vs. Population Baseline</div>
+                    <div class="comparison-bar" id="comparisonBar"></div>
+                    <div class="graph-sub">Based on same age and sex population average</div>
+                </div>
+
+                <!-- Predictive Analytics Graph -->
+                <div class="graph-container" id="predictiveGraph" style="display:none;">
+                    <div class="graph-title">Predictive Analytics — Risk Reduction Potential</div>
+                    <canvas id="predictiveChart" width="400" height="200" style="max-width:100%; height:auto;"></canvas>
+                    <div class="graph-sub">Projected risk assumes consistent adherence to the 6-month action plan</div>
+                </div>
+
+                <!-- What's Driving Your Risk Graph -->
+                <div class="graph-container" id="driversGraph" style="display:none;">
+                    <div class="graph-title">What's Driving Your Risk?</div>
+                    <div class="drivers-grid" id="driversGrid"></div>
+                </div>
+
+                <div style="display:flex;gap:4px;margin-bottom:1.2rem;background:rgba(178,34,34,0.04);border:1px solid rgba(178,34,34,0.12);border-radius:12px;padding:4px;width:fit-content;">
+                    <button id="tab-rec-btn" onclick="switchTab('rec')" style="background:#b22222;color:#fff;border:none;border-radius:9px;padding:0.45rem 1.2rem;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer;">📈 Recommendations</button>
+                    <button id="tab-plan-btn" onclick="switchTab('plan')" style="background:transparent;border:none;border-radius:9px;padding:0.45rem 1.2rem;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:600;color:#5f3d3d;cursor:pointer;">🗺️ 6-Month Plan</button>
+                </div>
+
+                <div id="tab-rec">
+                    <div class="recommendations-box">
+                        <h4>Key Recommendations</h4>
+                        <ul id="recommendationsList"></ul>
+                    </div>
+                </div>
+
+                <div id="tab-plan" style="display:none">
+                    <div id="planTierNote" style="font-size:0.8rem;color:#5f3d3d;padding:0.6rem 1rem;margin-bottom:1rem;background:rgba(178,34,34,0.04);border-left:3px solid #b22222;border-radius:0 8px 8px 0;"></div>
+                    <div id="roadmapGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;text-align:left;"></div>
+                    <div style="display:flex;gap:1rem;align-items:flex-start;background:linear-gradient(135deg,#fff0f0,#fff8f8);border:1.5px solid rgba(178,34,34,0.25);border-radius:14px;padding:1.2rem 1.5rem;text-align:left;">
+                        <span style="font-size:1.7rem;flex-shrink:0;">🏆</span>
+                        <div>
+                            <div style="font-size:0.92rem;font-weight:700;color:#b22222;margin-bottom:0.3rem;">People just like you have done it.</div>
+                            <div style="font-size:0.82rem;color:#5f3d3d;line-height:1.6;">"Followed the 6-month plan and dropped from 12% → 7% — a 40% improvement." A 54-year-old male achieved this by hitting 9,000 steps/day, reducing sodium, and completing the cholesterol retest at month 6. <strong>Your goal is achievable.</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-actions" style="margin-top:1.5rem;">
+                    <a href="my-report.html" class="btn btn-primary">View Full Report →</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // ── Cholesterol reference table ──
+        const CHOL_REF = {
+            '30-39': { male:{ total:200, hdl:46, total_range:'180–220', hdl_range:'38–52' }, female:{ total:185, hdl:54, total_range:'170–200', hdl_range:'45–62' } },
+            '40-49': { male:{ total:210, hdl:44, total_range:'190–230', hdl_range:'35–50' }, female:{ total:195, hdl:52, total_range:'180–210', hdl_range:'42–60' } },
+            '50-59': { male:{ total:220, hdl:42, total_range:'200–240', hdl_range:'35–48' }, female:{ total:225, hdl:50, total_range:'210–240', hdl_range:'40–58' } },
+            '60-69': { male:{ total:217, hdl:42, total_range:'200–235', hdl_range:'35–48' }, female:{ total:235, hdl:50, total_range:'220–250', hdl_range:'40–58' } },
+            '70+':   { male:{ total:207, hdl:42, total_range:'190–225', hdl_range:'35–48' }, female:{ total:225, hdl:50, total_range:'210–240', hdl_range:'40–58' } },
+        };
+
+        function getAgeGroup(age) {
+            if (age < 30) return null;
+            if (age < 40) return '30-39';
+            if (age < 50) return '40-49';
+            if (age < 60) return '50-59';
+            if (age < 70) return '60-69';
+            return '70+';
+        }
+
+        // ── Age range check (18-29 and >79) ──
+        function checkAgeRange() {
+            const age = parseInt(document.getElementById('age').value);
+            const ageWarning = document.getElementById('ageWarning');
+            const calculateBtn = document.getElementById('calculateBtn');
+            const warningIcon = document.getElementById('ageWarningIcon');
+            const warningTitle = document.getElementById('ageWarningTitle');
+            const warningText = document.getElementById('ageWarningText');
+            
+            if (age >= 18 && age <= 29) {
+                ageWarning.style.display = 'block';
+                warningTitle.textContent = 'Great news!';
+                warningText.innerHTML = 'Our model is validated for ages 30-79. Since you\'re under 30, your heart risk is naturally very low. Focus on building healthy habits - regular exercise, balanced diet, and avoid smoking - to keep it that way.';
+                calculateBtn.disabled = true;
+                calculateBtn.style.opacity = '0.5';
+                calculateBtn.style.cursor = 'not-allowed';
+                calculateBtn.title = 'Risk calculation is only available for ages 30-79';
+            } else if (age > 79) {
+                ageWarning.style.display = 'block';
+                warningTitle.textContent = 'Age limit exceeded';
+                warningText.innerHTML = 'Our model is validated for ages 30-79. For individuals above 79, please consult your healthcare provider directly for a personalised risk assessment.';
+                calculateBtn.disabled = true;
+                calculateBtn.style.opacity = '0.5';
+                calculateBtn.style.cursor = 'not-allowed';
+                calculateBtn.title = 'Risk calculation is only available for ages 30-79';
+            } else {
+                ageWarning.style.display = 'none';
+                calculateBtn.disabled = false;
+                calculateBtn.style.opacity = '1';
+                calculateBtn.style.cursor = 'pointer';
+                calculateBtn.title = '';
+            }
+        }
+
+        // ── Cholesterol mode toggle ──
+        let cholMode = 'enter';
+
+        function setCholMode(mode) {
+            cholMode = mode;
+            document.getElementById('optEnter').classList.toggle('active', mode === 'enter');
+            document.getElementById('optEstimate').classList.toggle('active', mode === 'estimate');
+
+            const note = document.getElementById('cholEstimateNote');
+
+            if (mode === 'estimate') {
+                const age = parseInt(document.getElementById('age').value);
+                const sex = document.getElementById('sex').value;
+                const group = getAgeGroup(age);
+
+                if (!age || !sex || !group || !CHOL_REF[group] || !CHOL_REF[group][sex]) {
+                    note.innerHTML = '⚠️ Please enter your <strong>Age</strong> and select <strong>Sex</strong> above first.';
+                    note.style.display = 'block';
+                    return;
+                }
+
+                const ref = CHOL_REF[group][sex];
+                document.getElementById('totalCholesterol').value = ref.total;
+                document.getElementById('hdlCholesterol').value   = ref.hdl;
+
+                note.innerHTML = `<strong>Age-based estimates applied</strong> for ${sex === 'male' ? 'Male' : 'Female'}, age group ${group} — `
+                    + `Total Cholesterol <strong>${ref.total} mg/dL</strong> (typical range ${ref.total_range}), `
+                    + `HDL <strong>${ref.hdl} mg/dL</strong> (typical range ${ref.hdl_range}). `
+                    + `Replace with your actual lab values for a more accurate result.`;
+                note.style.display = 'block';
+            } else {
+                note.style.display = 'none';
+            }
+        }
+
+        // ── Guide toggle ──
+        function toggleGuide() {
+            document.getElementById('guideSteps').classList.toggle('open');
+            document.getElementById('guideChevron').classList.toggle('open');
+        }
+
+        // ── CSV drag-and-drop ──
+        const csvZone = document.getElementById('csvZone');
+        csvZone.addEventListener('dragover', e => { e.preventDefault(); csvZone.classList.add('drag-over'); });
+        csvZone.addEventListener('dragleave', () => csvZone.classList.remove('drag-over'));
+        csvZone.addEventListener('drop', e => {
+            e.preventDefault();
+            csvZone.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file && file.name.endsWith('.csv')) parseCSV(file);
+        });
+
+        function handleCSV(input) {
+            const file = input.files[0];
+            if (file) parseCSV(file);
+        }
+
+        function parseCSV(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const lines = e.target.result.split('\n').filter(l => l.trim());
+                if (lines.length < 2) return;
+                const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+                const mapping = {
+                    'step count':'steps','daily steps':'steps','steps':'steps',
+                    'move minutes count':'moveMinutes','move minutes/day':'moveMinutes','move minutes':'moveMinutes',
+                    'calories (kcal)':'calories','calories (kcal)/day':'calories','calories':'calories',
+                    'distance (m)':'distance','distance (m)/day':'distance','distance':'distance',
+                    'heart points':'heartPoints','heart points/day':'heartPoints',
+                    'heart minutes':'heartMinutes','heart minutes/day':'heartMinutes',
+                    'average speed (m/s)':'avgSpeed','avg speed (m/s)':'avgSpeed','avg speed':'avgSpeed',
+                    'max speed (m/s)':'maxSpeed','max speed':'maxSpeed',
+                    'min speed (m/s)':'minSpeed','min speed':'minSpeed',
+                    'walking duration (ms)':'walkingDuration','walking duration':'walkingDuration',
+                    'average weight (kg)':'avgWeight','avg weight (kg)':'avgWeight','avg weight':'avgWeight',
+                    'max weight (kg)':'maxWeight','max weight':'maxWeight',
+                    'min weight (kg)':'minWeight','min weight':'minWeight',
+                };
+                const sums = {}; const counts = {};
+                headers.forEach(h => { sums[h] = 0; counts[h] = 0; });
+                for (let i = 1; i < lines.length; i++) {
+                    const values = lines[i].split(',').map(v => v.trim());
+                    headers.forEach((h, idx) => {
+                        const n = parseFloat(values[idx]);
+                        if (!isNaN(n)) { sums[h] += n; counts[h] += 1; }
+                    });
+                }
+                headers.forEach(h => {
+                    const id = mapping[h];
+                    if (id && counts[h] > 0) {
+                        const el = document.getElementById(id);
+                        if (el) el.value = parseFloat((sums[h] / counts[h]).toFixed(2));
+                    }
+                });
+                document.getElementById('csvFileName').textContent = `${file.name} uploaded — fields auto-filled with your daily averages.`;
+                document.getElementById('csvSuccess').classList.add('visible');
+            };
+            reader.readAsText(file);
+        }
+
+        let predictiveChart = null;
+
+        function updateGraphs(riskPercent, baselineRisk, drivers) {
+            // Show graph containers
+            document.getElementById('comparisonGraph').style.display = 'block';
+            document.getElementById('predictiveGraph').style.display = 'block';
+            document.getElementById('driversGraph').style.display = 'block';
+
+            // Comparison Bar
+            const yourPct = riskPercent;
+            const peerPct = baselineRisk;
+            const total = yourPct + peerPct;
+            const yourWidth = (yourPct / total) * 100;
+            const peerWidth = (peerPct / total) * 100;
+            
+            document.getElementById('comparisonBar').innerHTML = `
+                <div class="comp-your" style="width: ${yourWidth}%;">${yourPct.toFixed(1)}%</div>
+                <div class="comp-peer" style="width: ${peerWidth}%;">${peerPct.toFixed(1)}%</div>
+            `;
+
+            // Predictive Analytics Chart
+            const labels = ['Now', '+3 mo', '+6 mo', '+1 yr', '+5 yr', '+10 yr'];
+            const currentData = new Array(6).fill(riskPercent);
+            const projectedData = [
+                riskPercent,
+                riskPercent * 0.93,
+                riskPercent * 0.87,
+                riskPercent * 0.80,
+                riskPercent * 0.65,
+                riskPercent * 0.50
+            ];
+
+            const ctx = document.getElementById('predictiveChart').getContext('2d');
+            if (predictiveChart) predictiveChart.destroy();
+            predictiveChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Current (no change)',
+                            data: currentData,
+                            borderColor: '#dc3545',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 3,
+                            pointBackgroundColor: '#dc3545',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Projected (with plan)',
+                            data: projectedData,
+                            borderColor: '#b22222',
+                            backgroundColor: 'rgba(178,34,34,0.05)',
+                            borderWidth: 3,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#b22222',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10 } } },
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toFixed(1)}%` } }
+                    },
+                    scales: {
+                        y: { title: { display: true, text: '10-Year Risk (%)', font: { size: 10 } }, beginAtZero: true, max: Math.max(riskPercent * 1.2, 30) },
+                        x: { title: { display: true, text: 'Time', font: { size: 10 } } }
+                    }
+                }
+            });
+
+            // Drivers Grid
+            const driversGrid = document.getElementById('driversGrid');
+            driversGrid.innerHTML = '';
+            const driverColors = { 'Age': '#6c757d', 'Blood Pressure': '#fd7e14', 'Cholesterol': '#ffc107', 'Lifestyle': '#b22222' };
+            for (const [key, value] of Object.entries(drivers)) {
+                driversGrid.innerHTML += `
+                    <div class="driver-card">
+                        <div class="driver-percent">${value}%</div>
+                        <div class="driver-label">${key}</div>
+                    </div>
+                `;
+            }
+        }
+
+        // ── Risk Calculation ──
+        function calculateRisk() {
+            const age   = parseFloat(document.getElementById('age').value);
+            
+            // Prevent calculation for ages 18-29 and above 79
+            if ((age >= 18 && age <= 29) || age > 79) {
+                alert('Risk calculation is only available for ages 30-79. Please enter a valid age.');
+                return;
+            }
+            
+            const sex   = document.getElementById('sex').value;
+            const tc    = parseFloat(document.getElementById('totalCholesterol').value);
+            const hdl   = parseFloat(document.getElementById('hdlCholesterol').value);
+            const sbp   = parseFloat(document.getElementById('systolic').value);
+            const bpMed = parseInt(document.getElementById('bpMedication').value);
+            const diab  = parseInt(document.getElementById('diabetes').value);
+            const smoke = parseFloat(document.getElementById('smoking').value);
+            const steps = parseFloat(document.getElementById('steps').value) || 5000;
+            const heartPoints = parseFloat(document.getElementById('heartPoints').value) || 0;
+
+            if (!age || !sex || !tc || !hdl || !sbp) {
+                alert('Please fill in all Clinical Parameters to calculate your risk.');
+                return;
+            }
+
+            const lnAge = Math.log(age);
+            const lnTC  = Math.log(tc);
+            const lnHDL = Math.log(hdl);
+            const lnSBP = Math.log(sbp);
+            let sum, baselineSurv, mean;
+
+            if (sex === 'female') {
+                sum = -29.799*lnAge + 4.884*lnAge*lnAge + 13.540*lnTC - 3.114*lnAge*lnTC
+                    - 13.578*lnHDL + 3.149*lnAge*lnHDL + (bpMed?2.019:1.957)*lnSBP
+                    + 7.574*smoke - 1.665*lnAge*smoke + 0.661*diab;
+                baselineSurv = 0.9665; mean = -29.18;
+            } else {
+                sum = 12.344*lnAge + 11.853*lnTC - 2.664*lnAge*lnTC
+                    - 7.990*lnHDL + 1.769*lnAge*lnHDL + (bpMed?1.797:1.764)*lnSBP
+                    + 7.837*smoke - 1.795*lnAge*smoke + 0.658*diab;
+                baselineSurv = 0.9144; mean = 61.18;
+            }
+
+            let risk = 1 - Math.pow(baselineSurv, Math.exp(sum - mean));
+            risk = applyLifestyleModifier(risk, steps, heartPoints);
+            showResults(risk);
+        }
+
+        function applyLifestyleModifier(risk, steps, heartPoints) {
+            let mod = 1.0;
+            if      (steps >= 10000) mod -= 0.30;
+            else if (steps >= 7500)  mod -= 0.22;
+            else if (steps >= 5000)  mod -= 0.12;
+            else if (steps < 3000)   mod += 0.10;
+            if (heartPoints >= 30)   mod -= 0.06;
+            mod = Math.max(0.6, Math.min(1.3, mod));
+            return Math.max(0.01, Math.min(1.0, risk * mod));
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-rec').style.display  = tab==='rec'  ? 'block' : 'none';
+            document.getElementById('tab-plan').style.display = tab==='plan' ? 'block' : 'none';
+            const recS  = 'background:#b22222;color:#fff;border:none;border-radius:9px;padding:0.45rem 1.2rem;font-family:DM Sans,sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer;';
+            const offS  = 'background:transparent;border:none;border-radius:9px;padding:0.45rem 1.2rem;font-family:DM Sans,sans-serif;font-size:0.83rem;font-weight:600;color:#5f3d3d;cursor:pointer;';
+            document.getElementById('tab-rec-btn').style.cssText  = tab==='rec'  ? recS : offS;
+            document.getElementById('tab-plan-btn').style.cssText = tab==='plan' ? recS : offS;
+        }
+
+        let gaugeChart = null;
+        function drawGauge(pct) {
+            const ctx = document.getElementById('riskGauge').getContext('2d');
+            if (gaugeChart) gaugeChart.destroy();
+            const color = pct < 5 ? '#28a745' : pct < 7.5 ? '#ffc107' : pct < 20 ? '#fd7e14' : '#dc3545';
+            gaugeChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: { datasets: [{ data:[pct, Math.max(0,30-pct)], backgroundColor:[color,'rgba(178,34,34,0.07)'], borderWidth:0, circumference:180, rotation:270 }] },
+                options: { cutout:'72%', plugins:{legend:{display:false},tooltip:{enabled:false}}, responsive:false, animation:{animateRotate:true,duration:1200,easing:'easeOutQuart'} }
+            });
+            document.getElementById('gaugePct').textContent = pct + '%';
+        }
+
+        function highlightAHA(pct) {
+            ['ahaLow','ahaBord','ahaInter','ahaHigh'].forEach(id => { document.getElementById(id).style.opacity='0.35'; document.getElementById(id).style.flex='1'; });
+            const id = pct<5?'ahaLow':pct<7.5?'ahaBord':pct<20?'ahaInter':'ahaHigh';
+            const el = document.getElementById(id);
+            el.style.opacity='1'; el.style.flex='1.9'; el.style.fontSize='0.78rem';
+        }
+
+        function getBaselineRisk(age, sex) {
+            const base = { male:{30:3,40:6,50:10,60:16,70:22}, female:{30:1.5,40:3,50:6,60:10,70:16} };
+            const s = sex === 'male' ? 'male' : 'female';
+            const ages = [70,60,50,40,30];
+            for (let a of ages) {
+                if (age >= a) return base[s][a];
+            }
+            return base[s][30];
+        }
+
+        function calculateDrivers(age, sysBP, totalChol, steps, smoker, diabetes) {
+            const ageContrib = Math.min(age / 70 * 30, 30);
+            const bpContrib = Math.min((sysBP - 100) / 80 * 25, 25) > 5 ? Math.min((sysBP - 100) / 80 * 25, 25) : 5;
+            const cholContrib = totalChol > 150 ? Math.min((totalChol - 150) / 150 * 20, 20) : 5;
+            let lifestyleContrib = Math.min(Math.max(0, 15 - (steps / 10000 * 15)) + (smoker === '1' ? 10 : 0) + (diabetes === '1' ? 8 : 0), 35);
+            const total = ageContrib + bpContrib + cholContrib + lifestyleContrib;
+            return {
+                'Age': Math.round(ageContrib / total * 100),
+                'Blood Pressure': Math.round(bpContrib / total * 100),
+                'Cholesterol': Math.round(cholContrib / total * 100),
+                'Lifestyle': Math.round(lifestyleContrib / total * 100)
+            };
+        }
+
+        function getFullRecs(pct, steps, smoker, diabetes, sysBP) {
+            const r = [];
+            if (pct < 5) {
+                r.push("Healthy lifestyle habits are the primary approach — no pharmacotherapy is indicated.");
+                r.push("Engage in at least 150 min/week moderate-intensity or 75 min/week vigorous aerobic exercise, plus muscle-strengthening 2x/week.");
+                r.push("Follow Mediterranean-style or DASH dietary pattern rich in fruits, vegetables, whole grains, lean protein, and healthy fats.");
+                r.push("Check BP, cholesterol & blood glucose every 4-6 years.");
+                r.push("Aim for 7-9 hours quality sleep per night.");
+                if (steps < 8000 && steps > 0) r.push("Increase daily steps — target 8,000-10,000/day.");
+                if (smoker==='1') r.push("Quit smoking immediately.");
+            } else if (pct < 7.5) {
+                r.push("If risk enhancers present, a clinician-patient discussion may justify statin initiation.");
+                r.push("Limit saturated fat to <6% of daily calories; reduce sodium to <2,300 mg/day.");
+                r.push("Progress toward 300 min/week moderate activity for greater cardiovascular benefit.");
+                if (sysBP >= 130) r.push("BP >=130 mmHg — consider pharmacotherapy if BP remains >=130/80 mmHg.");
+                if (smoker==='1') r.push("Quit smoking NOW — single biggest modifiable cardiovascular risk factor.");
+                if (diabetes==='1') r.push("Maintain glycaemic control — HbA1c target <7%.");
+            } else if (pct < 20) {
+                r.push("Initiate Moderate-Intensity Statin — discuss with your cardiologist within 30 days.");
+                r.push("Aim for LDL-C <100 mg/dL (or <70 mg/dL with risk enhancers).");
+                r.push("Combine Mediterranean diet, structured exercise, and weight loss.");
+                r.push("Strict BP control (<130/80 mmHg); optimise glycaemic control if diabetic.");
+                if (smoker==='1') r.push("Quit smoking immediately.");
+            } else {
+                r.push("Initiate High-Intensity Statin immediately (atorvastatin 40-80 mg or rosuvastatin 20-40 mg).");
+                r.push("Referral to outpatient cardiac rehabilitation is strongly recommended.");
+                r.push("Achieve BP <130/80 mmHg, HbA1c <7% (if diabetic), and BMI <25.");
+                if (smoker==='1') r.push("Quit smoking IMMEDIATELY.");
+                if (pct >= 30) r.push("VERY HIGH RISK — target LDL-C <55 mg/dL; 3-month follow-up mandatory.");
+            }
+            return r;
+        }
+
+        function getPlanData(pct) {
+            const ph = (p,t,d) => `<div style="background:#fff;border:1.5px solid rgba(178,34,34,0.2);border-radius:14px;padding:1.1rem 1.2rem;box-shadow:0 4px 14px rgba(178,34,34,0.07);"><div style="display:inline-block;font-size:0.62rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#fff;background:#b22222;border-radius:5px;padding:0.15rem 0.5rem;margin-bottom:0.5rem;">${p}</div><div style="font-size:0.9rem;font-weight:700;color:#b22222;margin-bottom:0.4rem;">${t}</div><div style="font-size:0.78rem;color:#5f3d3d;line-height:1.6;">${d}</div></div>`;
+            if (pct<5) return [
+                ph('Phase 1 - Months 1-2','Lifestyle Foundation','Maintain 150-300 min/week moderate activity. Mediterranean/DASH diet. 7-9 hrs sleep.'),
+                ph('Phase 2 - Months 3-4','Optimization','Increase activity to 300 min/week. Add resistance training 2x/week. Sodium <2,300 mg/day.'),
+                ph('Phase 3 - Months 5-6','Long-term Maintenance','Establish sustainable routine. Annual health check-up.'),
+            ].join('');
+            if (pct<7.5) return [
+                ph('Phase 1 - Months 1-2','Assessment & Foundation','Baseline lipid panel, BP and weight. 150 min/week moderate activity. Mediterranean diet.'),
+                ph('Phase 2 - Months 3-4','Intensification','200-300 min/week activity. Recheck lipids at 4-8 wks. Aim LDL-C <100 mg/dL.'),
+                ph('Phase 3 - Months 5-6','Optimization','If LDL-C not at goal, intensify statin or add ezetimibe. 6-month follow-up.'),
+            ].join('');
+            if (pct<20) return [
+                ph('Phase 1 - Months 1-2','Initiate Therapy','Moderate-to-high statin. 150 min/week + resistance 2x/week. DASH diet.'),
+                ph('Phase 2 - Months 3-4','Monitor & Adjust','Recheck LDL-C. Target LDL-C <100 mg/dL; add ezetimibe if needed.'),
+                ph('Phase 3 - Months 5-6','Optimization','Reassess 10-year risk. 3-6 month follow-up plan.'),
+            ].join('');
+            return [
+                ph('Phase 1 - Months 1-2','Immediate Intervention','High-intensity statin NOW. Cardiac rehab. DASH diet; sodium <1,500 mg/day.'),
+                ph('Phase 2 - Months 3-4','Intensify & Monitor','Recheck LDL-C at 4-8 wks; target <70 mg/dL. BP <130/80 mmHg.'),
+                ph('Phase 3 - Months 5-6','Optimization','If very high risk, consider LDL-C <55 mg/dL. 3-month follow-up.'),
+            ].join('');
+        }
+
+        function showResults(risk) {
+            const pct = parseFloat((risk * 100).toFixed(1));
+            // ── Special message for young adults (18-29 years) ──
+            const userAge = parseFloat(document.getElementById('age').value);
+            if (userAge >= 18 && userAge <= 29) {
+                const youngAdultMessage = document.createElement('div');
+                youngAdultMessage.style.cssText = 'background: #e8f5e9; border: 1px solid #2e8b2e; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; text-align: left;';
+                youngAdultMessage.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div>
+                            <strong style="color: #2e8b2e; font-size: 1rem;">You're in a great position to protect your heart!</strong>
+                            <p style="color: #5f3d3d; font-size: 0.85rem; margin-top: 4px;">At your age, heart disease risk is naturally low. Focus on building healthy habits now — regular exercise, balanced diet, and avoiding smoking — to keep it that way for decades to come.</p>
+                        </div>
+                    </div>
+                `;
+    
+                // Insert at the top of results card, below the risk gauge
+                const resultsCard = document.getElementById('resultsCard');
+                const firstChild = resultsCard.querySelector('.graph-container');
+                if (firstChild) {
+                    resultsCard.insertBefore(youngAdultMessage, firstChild);
+                } else {
+                    const riskDiv = document.querySelector('#resultsCard > div:first-child');
+                    if (riskDiv) riskDiv.after(youngAdultMessage);
+                }
+            }
+            let category;
+            if      (risk < 0.05)  category = 'Low Risk (< 5%)';
+            else if (risk < 0.075) category = 'Borderline Risk (5 - 7.5%)';
+            else if (risk < 0.20)  category = 'Intermediate Risk (7.5 - 20%)';
+            else                   category = 'High Risk (> 20%)';
+
+            const steps    = parseFloat(document.getElementById('steps').value) || 0;
+            const smoker   = document.getElementById('smoking').value;
+            const diabetes = document.getElementById('diabetes').value;
+            const sysBP    = parseFloat(document.getElementById('systolic').value) || 0;
+            const age      = parseFloat(document.getElementById('age').value) || 0;
+            const sex      = document.getElementById('sex').value;
+            const totalChol = parseFloat(document.getElementById('totalCholesterol').value) || 0;
+
+            const baselineRisk = getBaselineRisk(age, sex);
+            const drivers = calculateDrivers(age, sysBP, totalChol, steps, smoker, diabetes);
+
+            let modText = 'Your activity data has been factored into this prediction.';
+            if      (steps >= 10000) modText = 'Your high activity level <strong>reduced</strong> your risk by approximately <strong>30%</strong>.';
+            else if (steps >= 7500)  modText = 'Your active lifestyle <strong>reduced</strong> your risk by approximately <strong>22%</strong>.';
+            else if (steps >= 5000)  modText = 'Your moderate activity <strong>reduced</strong> your risk by approximately <strong>12%</strong>.';
+            else if (steps > 0)      modText = 'Increasing your daily steps could meaningfully <strong>reduce</strong> your heart risk.';
+
+            document.getElementById('riskPercentage').textContent = pct.toFixed(1) + '%';
+            document.getElementById('riskCategory').textContent   = category;
+            document.getElementById('lifestyleImpact').innerHTML  = modText;
+
+            drawGauge(pct);
+            highlightAHA(pct);
+            updateGraphs(pct, baselineRisk, drivers);
+
+            document.getElementById('recommendationsList').innerHTML = getFullRecs(pct, steps, smoker, diabetes, sysBP).map(r => `<li>${r}</li>`).join('');
+
+            const tierNotes = {low:'Low Risk - lifestyle maintenance.',borderline:'Borderline - diet optimisation and possible statin discussion.',intermediate:'Intermediate - statin initiation and monitoring.',high:'High Risk - immediate high-intensity statin and cardiac rehabilitation.'};
+            const tierKey = pct<5?'low':pct<7.5?'borderline':pct<20?'intermediate':'high';
+            document.getElementById('planTierNote').textContent = tierNotes[tierKey];
+            document.getElementById('roadmapGrid').innerHTML = getPlanData(pct);
+
+            const g = (id, fb) => document.getElementById(id)?.value || fb;
+            const smokeLabel = smoker==='1'?'Current smoker':smoker==='0.5'?'Former smoker':'Non-smoker';
+            sessionStorage.setItem('risk', pct.toFixed(1));
+            sessionStorage.setItem('category', category);
+            sessionStorage.setItem('name', document.getElementById('patientName').value || 'Patient');
+            sessionStorage.setItem('age', g('age','--'));
+            sessionStorage.setItem('sex', document.getElementById('sex').value==='female'?'Female':'Male');
+            sessionStorage.setItem('total_chol', g('totalCholesterol','--'));
+            sessionStorage.setItem('hdl_chol', g('hdlCholesterol','--'));
+            sessionStorage.setItem('sys_bp', g('systolic','--'));
+            sessionStorage.setItem('dia_bp', g('diastolic','--'));
+            sessionStorage.setItem('on_med', document.getElementById('bpMedication').value==='1'?'Yes':'No');
+            sessionStorage.setItem('diabetes', diabetes==='1'?'Yes':'No');
+            sessionStorage.setItem('smoker', smokeLabel);
+            sessionStorage.setItem('steps', g('steps','0'));
+            sessionStorage.setItem('move_min', g('moveMinutes','0'));
+            sessionStorage.setItem('calories', g('calories','0'));
+            sessionStorage.setItem('distance', g('distance','0'));
+            sessionStorage.setItem('hp', g('heartPoints','0'));
+            sessionStorage.setItem('hm', g('heartMinutes','0'));
+            sessionStorage.setItem('avg_spd', g('avgSpeed','0'));
+            sessionStorage.setItem('max_spd', g('maxSpeed','0'));
+            sessionStorage.setItem('min_spd', g('minSpeed','0'));
+            sessionStorage.setItem('avg_wt', g('avgWeight','0'));
+            sessionStorage.setItem('max_wt', g('maxWeight','0'));
+            sessionStorage.setItem('min_wt', g('minWeight','0'));
+            sessionStorage.setItem('walk_dur', g('walkingDuration','0'));
+
+            const card = document.getElementById('resultsCard');
+            card.classList.add('visible');
+            card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function emailReport() { alert('Email report functionality will be connected to your backend.'); }
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/corvia-chat.css') }}">
+    <script src="{{ url_for('static', filename='js/corvia-chat.js') }}"></script>
+</body>
+</html>
+```

@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORVIA - Find a Hospital</title>
+    <img src="{{ url_for('static', filename='FYP Logo (1).png') }}" id="report-logo" alt="CORVIA" class="logo-img" style="display:none;">
+
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #b22222;
+            --primary-red-dark: #8b1a1a;
+            --pastel-red: #fff0f0;
+            --white: #ffffff;
+            --text-dark: #1a0a0a;
+            --text-mid: #5f3d3d;
+            --border: rgba(178,34,34,0.13);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--white);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* ── HEADER ── */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 5%;
+            background: var(--pastel-red);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+
+        .logo-wrap { display: flex; align-items: center; text-decoration: none; }
+        .logo-img { height: 70px; width: auto; display: block; mix-blend-mode: multiply; }
+
+        nav ul { display: flex; list-style: none; gap: 32px; }
+        nav a {
+            text-decoration: none; color: var(--text-mid);
+            font-weight: 500; font-size: 15px;
+            transition: color 0.25s; position: relative;
+        }
+        nav a:hover, nav a.active { color: var(--primary-red); }
+        nav a.active::after {
+            content: ''; position: absolute;
+            bottom: -4px; left: 0;
+            width: 100%; height: 2px;
+            background: var(--primary-red); border-radius: 2px;
+        }
+
+        /* ── PAGE HERO ── */
+        .page-hero {
+            background: linear-gradient(145deg, #fff8f8 0%, #ffeded 55%, #ffe0e0 100%);
+            padding: 52px 5% 44px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(178,34,34,0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .page-hero-label {
+            display: inline-block;
+            font-size: 11px; font-weight: 700; letter-spacing: 3px;
+            text-transform: uppercase; color: var(--primary-red);
+            margin-bottom: 16px; padding: 5px 16px;
+            border: 1px solid rgba(178,34,34,0.25); border-radius: 50px;
+        }
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            font-weight: 800; color: var(--text-dark);
+            line-height: 1.15; margin-bottom: 14px;
+        }
+        .page-hero h1 span { color: var(--primary-red); font-style: italic; }
+        .page-hero p {
+            font-size: 1rem; color: var(--text-mid);
+            max-width: 560px; margin: 0 auto; line-height: 1.8;
+        }
+
+        /* ── MAIN SECTION ── */
+        .main-section {
+            padding: 52px 5% 80px;
+            background: var(--white);
+        }
+        .main-wrap { max-width: 1160px; margin: 0 auto; }
+
+        /* ── SEARCH BAR ── */
+        .search-wrap {
+            display: flex;
+            gap: 12px;
+            max-width: 560px;
+            margin: 0 auto 40px;
+            animation: fadeUp 0.8s ease both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .pincode-input {
+            flex: 1;
+            padding: 13px 18px;
+            border: 1.5px solid rgba(178,34,34,0.25);
+            border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background: #fffafa;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            letter-spacing: 1px;
+        }
+        .pincode-input:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(178,34,34,0.08);
+            background: var(--white);
+        }
+        .pincode-input::placeholder { color: #c4a0a0; letter-spacing: 0; }
+
+        .search-btn {
+            padding: 13px 28px;
+            background: var(--primary-red);
+            color: var(--white);
+            border: none; border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600; font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(178,34,34,0.28);
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        .search-btn:hover {
+            background: var(--primary-red-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 22px rgba(178,34,34,0.38);
+        }
+
+        /* ── MAP ── */
+        .map-container {
+            width: 100%;
+            height: 380px;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            box-shadow: 0 8px 32px rgba(178,34,34,0.09);
+            margin-bottom: 40px;
+            animation: fadeUp 0.8s 0.1s ease both;
+            position: relative;
+            background: #f0e8e8;
+        }
+
+        .map-container iframe {
+            width: 100%; height: 100%;
+            border: none; display: block;
+        }
+
+        /* Map placeholder (shown before search) */
+        .map-placeholder {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #fff5f5 0%, #ffe8e8 100%);
+        }
+        .map-placeholder .mp-icon { font-size: 3rem; }
+        .map-placeholder .mp-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem; font-style: italic;
+            color: var(--text-mid);
+        }
+        .map-placeholder .mp-sub {
+            font-size: 0.82rem; color: rgba(95,61,61,0.6);
+        }
+
+        /* ── BOOKING INSTRUCTIONS ── */
+        .booking-guide {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 36px 40px;
+            margin-top: 40px;
+            animation: fadeUp 0.8s 0.15s ease both;
+            box-shadow: 0 6px 24px rgba(178,34,34,0.07);
+        }
+
+        .guide-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .guide-title span { color: var(--primary-red); font-style: italic; }
+
+        .guide-sub {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            margin-bottom: 28px;
+            border-bottom: 1px solid rgba(178,34,34,0.1);
+            padding-bottom: 12px;
+        }
+
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 1px solid rgba(178,34,34,0.08);
+        }
+        .step-card:hover {
+            transform: translateY(-4px);
+            background: var(--white);
+            border-color: rgba(178,34,34,0.15);
+            box-shadow: 0 8px 20px rgba(178,34,34,0.1);
+        }
+
+        .step-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .step-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            margin-bottom: 6px;
+        }
+
+        .step-desc {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+            line-height: 1.5;
+        }
+
+        .report-note {
+            background: rgba(178,34,34,0.05);
+            border-radius: 14px;
+            padding: 16px 24px;
+            text-align: center;
+            border-left: 4px solid var(--primary-red);
+        }
+
+        .report-note p {
+            font-size: 0.88rem;
+            color: var(--text-mid);
+            line-height: 1.6;
+        }
+
+        .report-note strong {
+            color: var(--primary-red);
+            font-weight: 700;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .steps-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 600px) {
+            nav ul { gap: 18px; }
+            nav a { font-size: 13px; }
+            .logo-img { height: 54px; }
+            .search-wrap { flex-direction: column; }
+            .steps-grid { grid-template-columns: 1fr; }
+            .booking-guide { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── HEADER ── -->
+    <header>
+        <a href="mission.html" class="logo-wrap">
+            <img src="{{ url_for('static', filename='FYP Logo (1).png') }}" id="report-logo" alt="CORVIA" class="logo-img" style="display:none;">
+
+        </a>
+        <nav>
+            <ul>
+                <li><a href="mission.html">Mission</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="risk-check.html">Risk Check</a></li>
+                <li><a href="my-report.html">My Report</a></li>
+                <li><a href="find-hospital.html" class="active">Find Hospital</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ── PAGE HERO ── -->
+    <div class="page-hero">
+        <div class="page-hero-label">Near You</div>
+        <h1>The Nearest Care<span> for Your Heart</span></h1>
+        <p>Your heart doesn't wait. Neither should you. Enter your pincode and connect with hospitals ready to care for you - right where you are.</p>
+    </div>
+
+    <!-- ── MAIN ── -->
+    <section class="main-section">
+        <div class="main-wrap">
+
+            <!-- PINCODE SEARCH -->
+            <div class="search-wrap">
+                <input
+                    type="text"
+                    class="pincode-input"
+                    id="pincodeInput"
+                    placeholder="Enter your pincode e.g. 400042"
+                    maxlength="6"
+                    inputmode="numeric"
+                    onkeydown="if(event.key==='Enter') searchHospitals()"
+                >
+                <button class="search-btn" onclick="searchHospitals()">🔍 Search</button>
+            </div>
+
+            <!-- MAP -->
+            <div class="map-container" id="mapContainer">
+                <div class="map-placeholder" id="mapPlaceholder">
+                    <span class="mp-icon">🗺️</span>
+                    <div class="mp-text">Your map will appear here</div>
+                    <div class="mp-sub">Enter a pincode above and click Search</div>
+                </div>
+                <iframe
+                    id="mapFrame"
+                    style="display:none;"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+
+            <!-- RESULTS LABEL -->
+            <div class="results-label" id="resultsLabel" style="display:none;">
+                Hospitals Near <span id="pincodeDisplay" style="color:var(--primary-red);margin-left:4px;font-style:italic;"></span>
+            </div>
+
+            <!-- ── HOW TO BOOK YOUR APPOINTMENT SECTION ── -->
+            <div class="booking-guide">
+                <div class="guide-title">
+                    <span>How to Book</span> Your Appointment
+                </div>
+                <div class="guide-sub">
+                    Follow these simple steps to get the care you need
+                </div>
+
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-title">Call the Hospital</div>
+                        <div class="step-desc">Use the phone number shown on the map above</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-title">Share Your Report</div>
+                        <div class="step-desc">Show your CORVIA risk report to the doctor</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-title">Get Directions</div>
+                        <div class="step-desc">Click on the map to find the best route</div>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-title">Mention CORVIA</div>
+                        <div class="step-desc">Get priority understanding of your risk profile</div>
+                    </div>
+                </div>
+
+                <div class="report-note">
+                    <p><strong>Your risk report is ready</strong> in the <strong>"My Report"</strong> section. Take it with you when you visit the hospital.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // ── Search hospitals by pincode ──
+        function searchHospitals() {
+            const pincode = document.getElementById('pincodeInput').value.trim();
+            if (!pincode || pincode.length < 6) {
+                alert('Please enter a valid 6-digit pincode.');
+                return;
+            }
+
+            // Show map via Google Maps embed
+            const mapFrame = document.getElementById('mapFrame');
+            const placeholder = document.getElementById('mapPlaceholder');
+
+            // Embed Google Maps search for hospitals near pincode
+            mapFrame.src = `https://maps.google.com/maps?q=hospitals+near+${pincode},+India&output=embed&z=13`;
+            mapFrame.style.display = 'block';
+            placeholder.style.display = 'none';
+
+            // Show results label
+            const label = document.getElementById('resultsLabel');
+            document.getElementById('pincodeDisplay').textContent = pincode;
+            label.style.display = 'flex';
+
+            // Scroll to map
+            document.getElementById('mapContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+
+</body>
+</html>

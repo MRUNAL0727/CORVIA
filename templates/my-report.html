@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORVIA - Heart Health Report</title>
+    <img src="{{ url_for('static', filename='FYP Logo (1).png') }}" id="report-logo" alt="CORVIA" class="logo-img" style="display:none;">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary-red: #b22222;
+            --primary-red-dark: #8b1a1a;
+            --pastel-red: #fff0f0;
+            --white: #ffffff;
+            --text-dark: #1a0a0a;
+            --text-mid: #5f3d3d;
+            --border: rgba(178,34,34,0.13);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #f5f0f0;
+            color: var(--text-dark);
+        }
+
+        /* ── HEADER ── */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 5%;
+            background: var(--pastel-red);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-wrap { display: flex; align-items: center; text-decoration: none; }
+
+        .logo-img {
+            height: 70px; width: auto;
+            display: block; mix-blend-mode: multiply;
+        }
+
+        nav ul { display: flex; list-style: none; gap: 32px; }
+
+        nav a {
+            text-decoration: none; color: var(--text-mid);
+            font-weight: 500; font-size: 15px;
+            transition: color 0.25s; position: relative;
+        }
+
+        nav a:hover, nav a.active { color: var(--primary-red); }
+
+        nav a.active::after {
+            content: ''; position: absolute;
+            bottom: -4px; left: 0;
+            width: 100%; height: 2px;
+            background: var(--primary-red); border-radius: 2px;
+        }
+
+        /* ── PAGE WRAPPER ── */
+        .page-wrap {
+            max-width: 900px;
+            margin: 40px auto 60px;
+            padding: 0 20px;
+        }
+
+        /* ── ACTION BAR (above report) ── */
+        .action-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .action-bar-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .action-bar-title span { color: var(--primary-red); font-style: italic; }
+
+        .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+
+        .email-group {
+            display: flex;
+            gap: 0;
+            border: 1.5px solid rgba(178,34,34,0.25);
+            border-radius: 50px;
+            overflow: hidden;
+            background: var(--white);
+        }
+
+        .email-group input {
+            padding: 10px 16px;
+            border: none;
+            outline: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            background: transparent;
+            width: 220px;
+        }
+
+        .email-group input::placeholder { color: #c4a0a0; }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 10px 22px;
+            border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: var(--primary-red);
+            color: var(--white);
+            box-shadow: 0 4px 16px rgba(178,34,34,0.28);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-red-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 22px rgba(178,34,34,0.38);
+        }
+
+        .btn-send {
+            background: var(--primary-red);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-send:hover { background: var(--primary-red-dark); }
+
+        /* ── REPORT CARD ── */
+        #reportCard {
+            background: var(--white);
+            border-radius: 4px;
+            box-shadow: 0 4px 30px rgba(0,0,0,0.12);
+            overflow: hidden;
+        }
+
+        /* ── REPORT HEADER STRIP ── */
+        .report-header-strip {
+            background: linear-gradient(135deg, var(--primary-red) 0%, var(--primary-red-dark) 100%);
+            padding: 0;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .rhs-accent {
+            width: 8px;
+            background: #fff;
+            opacity: 0.15;
+        }
+
+        .rhs-content {
+            flex: 1;
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .rhs-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        .rhs-subtitle {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.7);
+            margin-top: 3px;
+            letter-spacing: 0.5px;
+        }
+
+        .rhs-logo-area {
+            text-align: right;
+        }
+
+        /* ── PATIENT INFO BAR ── */
+        .patient-bar {
+            background: #faf5f5;
+            border-bottom: 2px solid var(--primary-red);
+            padding: 14px 28px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .patient-field .pf-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--primary-red);
+            margin-bottom: 3px;
+        }
+
+        .patient-field .pf-value {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* ── REPORT BODY ── */
+        .report-body {
+            padding: 28px 28px 24px;
+        }
+
+        /* ── SECTION BLOCK ── */
+        .section-block {
+            margin-bottom: 24px;
+        }
+
+        /* ── SECTION HEADING ── */
+        .section-heading {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--white);
+            background: var(--primary-red);
+            padding: 5px 12px;
+            border-radius: 4px 4px 0 0;
+            display: block;
+            margin-bottom: 0;
+        }
+
+        /* ── DATA TABLE (like lab report) ── */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.83rem;
+            border: 1px solid rgba(178,34,34,0.15);
+            border-top: none;
+        }
+
+        .data-table th {
+            background: #fff5f5;
+            color: var(--text-mid);
+            font-size: 0.68rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 7px 10px;
+            border-bottom: 1px solid rgba(178,34,34,0.15);
+            text-align: left;
+        }
+
+        .data-table td {
+            padding: 7px 10px;
+            border-bottom: 1px solid rgba(178,34,34,0.07);
+            color: var(--text-dark);
+            vertical-align: middle;
+        }
+
+        .data-table tr:last-child td { border-bottom: none; }
+
+        .data-table tr:nth-child(even) td { background: #fffafa; }
+
+        .data-table .val-col { font-weight: 600; color: var(--primary-red); }
+
+        .data-table .ref-col { font-size: 0.76rem; color: #888; }
+
+        .flag-high {
+            display: inline-block;
+            background: rgba(220,53,69,0.1);
+            color: #dc3545;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-left: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .flag-low {
+            display: inline-block;
+            background: rgba(255,153,0,0.1);
+            color: #e67e00;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-left: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .flag-good {
+            display: inline-block;
+            background: rgba(34,139,34,0.1);
+            color: #1a5c1a;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 3px;
+            margin-left: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ── RESULT SECTION ── */
+        .result-box {
+            border: 1.5px solid rgba(178,34,34,0.2);
+            border-radius: 0 0 6px 6px;
+            padding: 28px 20px 24px;
+            text-align: center;
+            background: linear-gradient(135deg, #fff8f8 0%, #ffeded 100%);
+            margin-bottom: 24px;
+        }
+
+        .result-pct {
+            font-family: 'Playfair Display', serif;
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .result-cat {
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            background: rgba(178,34,34,0.1);
+            color: var(--primary-red);
+            border: 1px solid rgba(178,34,34,0.2);
+            margin-bottom: 8px;
+        }
+
+        .result-desc {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+            line-height: 1.5;
+        }
+
+        /* bar chart */
+        .bar-section {
+            border: 1px solid rgba(178,34,34,0.15);
+            border-top: none;
+            padding: 18px 20px;
+        }
+
+        .bar-row { margin-bottom: 10px; }
+        .bar-row:last-child { margin-bottom: 0; }
+
+        .bar-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.76rem;
+            color: var(--text-mid);
+            margin-bottom: 4px;
+        }
+
+        .bar-meta .bar-val { font-weight: 600; color: var(--text-dark); }
+
+        .bar-track {
+            height: 7px;
+            background: rgba(178,34,34,0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        /* ── REPORT FOOTER ── */
+        .report-footer {
+            margin: 0 28px;
+            padding: 22px 0 28px;
+            border-top: 1.5px solid rgba(178,34,34,0.15);
+            text-align: center;
+        }
+
+        .footer-disclaimer-line {
+            font-size: 0.72rem;
+            color: #aaa;
+            font-style: italic;
+            line-height: 1.65;
+            text-align: center;
+            max-width: 680px;
+            margin: 0 auto 18px;
+        }
+
+        /* Consult Doctor Button - OUTSIDE report, not in PDF */
+        .outside-consult {
+            text-align: center;
+            margin-top: 32px;
+        }
+
+        .btn-appt {
+            display: inline-block;
+            background: var(--primary-red);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(178,34,34,0.28);
+        }
+
+        .btn-appt:hover {
+            background: var(--primary-red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(178,34,34,0.35);
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 720px) {
+            .patient-bar { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 600px) {
+            nav ul { gap: 16px; }
+            nav a { font-size: 13px; }
+            .logo-img { height: 54px; }
+            .action-bar { flex-direction: column; align-items: flex-start; }
+            .email-group input { width: 160px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── HEADER ── -->
+    <header>
+        <a href="/about" class="logo-wrap">
+        <img src="{{ url_for('static', filename='FYP Logo (1).png') }}" alt="CORVIA" class="logo-img">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="/mission">Mission</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/risk-check">Risk Check</a></li>
+                <li><a href="/my-report">My Report</a></li>
+                <li><a href="/find-hospital">Find Hospital</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="page-wrap">
+
+        <!-- ── ACTION BAR ── -->
+        <div class="action-bar">
+            <div class="action-bar-title">Your Heart Health <span>Report</span></div>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="downloadPDF()">
+                    📥 Download PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- ── REPORT CARD ── -->
+        <div id="reportCard">
+
+            <!-- HEADER STRIP -->
+            <div class="report-header-strip">
+                <div class="rhs-accent"></div>
+                <div class="rhs-content">
+                    <div>
+                        <div class="rhs-title">HEART RISK ASSESSMENT REPORT</div>
+                        <div class="rhs-subtitle">10-Year Cardiovascular Event Risk</div>
+                    </div>
+                    <div class="rhs-logo-area">
+                        <img src="{{ url_for('static', filename='FYP Logo (1).png') }}" alt="CORVIA" class="logo-img">
+                    </div>
+                </div>
+            </div>
+
+            <!-- PATIENT INFO BAR -->
+            <div class="patient-bar">
+                <div class="patient-field">
+                    <div class="pf-label">Patient Name</div>
+                    <div class="pf-value" id="ptName">—</div>
+                </div>
+                <div class="patient-field">
+                    <div class="pf-label">Age / Sex</div>
+                    <div class="pf-value" id="ptAgeSex">—</div>
+                </div>
+                <div class="patient-field">
+                    <div class="pf-label">Report ID</div>
+                    <div class="pf-value" id="ptReportId">—</div>
+                </div>
+                <div class="patient-field">
+                    <div class="pf-label">Generated On</div>
+                    <div class="pf-value" id="ptDate">—</div>
+                </div>
+            </div>
+
+            <!-- REPORT BODY -->
+            <div class="report-body">
+
+                <!-- RISK RESULT BOX — full width, centred, matches PDF -->
+                <div class="section-block">
+                <span class="section-heading">10-Year Cardiovascular Risk</span>
+                <div class="result-box">
+                    <div class="result-pct" id="resultPct">—</div>
+                    <div class="result-cat" id="resultCat">—</div>
+                    <div class="result-desc">What your heart faces in the next decade, based on science and your daily life</div>
+                </div>
+                </div>
+
+                <!-- CLINICAL PARAMETERS -->
+                <div class="section-block">
+                    <span class="section-heading">Clinical Parameters</span>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Investigation</th>
+                                <th>Result</th>
+                                <th>Unit</th>
+                                <th>Ref. Range</th>
+                            </tr>
+                        </thead>
+                        <tbody id="clinicalTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- ACTIVITY DATA -->
+                <div class="section-block">
+                    <span class="section-heading">Activity Data (Google Fit)</span>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                                <th>Unit</th>
+                                <th>AHA Target</th>
+                            </tr>
+                        </thead>
+                        <tbody id="lifestyleTableBody"></tbody>
+                    </table>
+                </div>
+
+                <!-- KEY METRICS BAR CHART -->
+                <div class="section-block">
+                    <span class="section-heading">Key Metrics vs. AHA Optimal</span>
+                    <div class="bar-section" id="barSection"></div>
+                </div>
+
+            </div><!-- end report-body -->
+
+            <!-- REPORT FOOTER (inside report card, will be included in PDF) -->
+            <div class="report-footer">
+                <div class="footer-disclaimer-line">
+                    This report is for informational purposes only and does not constitute medical advice. Always consult a qualified healthcare professional.
+                </div>
+            </div>
+
+        </div><!-- end reportCard -->
+
+    </div><!-- end page-wrap -->
+
+    <script>
+        // ── Read all values from sessionStorage (saved by risk-check.html) ──
+        function getVal(key, fallback) {
+            const v = sessionStorage.getItem(key);
+            return (v !== null && v !== '' && v !== 'undefined') ? v : fallback;
+        }
+
+        // ── Core values ──
+        const age      = getVal('age',        '—');
+        const sex      = getVal('sex',        '—');
+        const tc       = getVal('total_chol', '—');
+        const hdl      = getVal('hdl_chol',   '—');
+        const sbp      = getVal('sys_bp',     '—');
+        const dbp      = getVal('dia_bp',     '—');
+        const bpMed    = getVal('on_med',     '—');
+        const diab     = getVal('diabetes',   '—');
+        const smoke    = getVal('smoker',     '—');
+        const steps    = getVal('steps',      '0');
+        const moveMins = getVal('move_min',   '0');
+        const cals     = getVal('calories',   '0');
+        const dist     = getVal('distance',   '0');
+        const hp       = getVal('hp',         '0');
+        const hm       = getVal('hm',         '0');
+        const avgSpd   = getVal('avg_spd',    '0');
+        const maxSpd   = getVal('max_spd',    '0');
+        const minSpd   = getVal('min_spd',    '0');
+        const avgWt    = getVal('avg_wt',     '0');
+        const maxWt    = getVal('max_wt',     '0');
+        const minWt    = getVal('min_wt',     '0');
+        const walkDur  = getVal('walk_dur',   '0');
+        const risk     = getVal('risk',       '—');
+        const category = getVal('category',   '—');
+        const name     = getVal('name',       'Patient');
+
+        // ── Show "no data" banner if sessionStorage is empty ──
+        if (sessionStorage.getItem('risk') === null) {
+            const wrap = document.querySelector('.page-wrap');
+            const banner = document.createElement('div');
+            banner.style.cssText = 'background:#fff3cd;border:1px solid #ffc107;color:#856404;padding:14px 20px;border-radius:10px;margin-bottom:18px;font-size:.9rem;';
+            banner.innerHTML = '⚠️ No assessment data found. <a href="risk-check.html" style="color:#b22222;font-weight:600;">Go to Risk Check →</a> to calculate your risk first. Showing demo values below.';
+            wrap.insertBefore(banner, wrap.firstChild);
+        }
+
+        // ── Date & Report ID ──
+        const now     = new Date();
+        const dateStr = now.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+        const timeStr = now.toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' });
+        document.getElementById('ptDate').textContent    = dateStr + ' · ' + timeStr;
+        document.getElementById('ptReportId').textContent = 'CVR-' + Math.random().toString(36).substr(2,6).toUpperCase();
+
+        // ── Patient bar ──
+        document.getElementById('ptName').textContent   = name;
+        document.getElementById('ptAgeSex').textContent = age + ' yrs / ' + sex;
+
+        // ── Risk result ──
+        document.getElementById('resultPct').textContent = risk !== '—' ? risk + '%' : '—';
+        document.getElementById('resultCat').textContent = category;
+
+        // ── Risk result colour by category ──
+        const riskNum = parseFloat(risk);
+        const rPct = document.getElementById('resultPct');
+        if (!isNaN(riskNum)) {
+            if      (riskNum < 5)  rPct.style.color = '#2e8b2e';
+            else if (riskNum < 7.5)rPct.style.color = '#e67e00';
+            else if (riskNum < 20) rPct.style.color = '#b22222';
+            else                   rPct.style.color = '#7b0000';
+        }
+
+        // ── Helper: flag logic ──
+        function getFlag(key, val) {
+            const n = parseFloat(val);
+            if (isNaN(n) || val === '—') return '';
+            const flags = {
+                total_chol: n > 200 ? 'HIGH' : (n < 150 ? 'LOW' : ''),
+                hdl_chol:   n >= 60 ? 'GOOD' : (n < 40 ? 'LOW' : ''),
+                sys_bp:     n >= 130 ? 'HIGH' : '',
+                dia_bp:     n >= 80  ? 'HIGH' : '',
+                steps:      n >= 10000 ? 'GOOD' : (n < 5000 ? 'LOW' : ''),
+                move_min:   n >= 30 ? 'GOOD' : (n < 15 ? 'LOW' : ''),
+                hp:         n >= 22 ? 'GOOD' : (n < 10 ? 'LOW' : ''),
+                hm:         n >= 22 ? 'GOOD' : '',
+            };
+            return flags[key] || '';
+        }
+
+        function flagHtml(flag) {
+            if (flag === 'HIGH') return '<span class="flag-high">▲ HIGH</span>';
+            if (flag === 'LOW')  return '<span class="flag-low">▼ LOW</span>';
+            if (flag === 'GOOD') return '<span class="flag-good">✓ GOOD</span>';
+            return '';
+        }
+
+        function safeNum(v, decimals=0) {
+            const n = parseFloat(v);
+            if (isNaN(n) || v === '—') return v;
+            return decimals > 0 ? n.toFixed(decimals) : n.toLocaleString();
+        }
+
+        // ── Clinical parameters table ──
+        const clinicalRows = [
+            { name:'Age',               val:age,   unit:'Years',  ref:'30 – 79',        key:'',          extra:'' },
+            { name:'Sex',               val:sex,   unit:'—',      ref:'—',              key:'',          extra:'' },
+            { name:'Total Cholesterol', val:tc,    unit:'mg/dL',  ref:'< 200',          key:'total_chol',extra:'' },
+            { name:'HDL Cholesterol',   val:hdl,   unit:'mg/dL',  ref:'> 60 (optimal)', key:'hdl_chol',  extra:'' },
+            { name:'Systolic BP',       val:sbp,   unit:'mmHg',   ref:'< 120',          key:'sys_bp',    extra:'' },
+            { name:'Diastolic BP',      val:dbp,   unit:'mmHg',   ref:'< 80',           key:'dia_bp',    extra:'' },
+            { name:'BP Medication',     val:bpMed, unit:'—',      ref:'—',              key:'',          extra:'' },
+            { name:'Diabetes',          val:diab,  unit:'—',      ref:'No',             key:'',          extra:diab==='Yes'?'<span class="flag-high">▲ YES</span>':'' },
+            { name:'Smoking Status',    val:smoke, unit:'—',      ref:'Non-smoker',     key:'',          extra:smoke!=='Non-smoker'&&smoke!=='—'?'<span class="flag-high">▲ RISK</span>':'' },
+        ];
+
+        const ctb = document.getElementById('clinicalTableBody');
+        clinicalRows.forEach(r => {
+            const f = r.extra || (r.key ? flagHtml(getFlag(r.key, r.val)) : '');
+            ctb.innerHTML += `<tr>
+                <td>${r.name}</td>
+                <td class="val-col">${r.val}${f}</td>
+                <td>${r.unit}</td>
+                <td class="ref-col">${r.ref}</td>
+            </tr>`;
+        });
+
+        // ── Lifestyle / activity table ──
+        const lifestyleRows = [
+            { name:'Daily Steps',     val:safeNum(steps),    unit:'steps/day', ref:'>= 10,000',  key:'steps'    },
+            { name:'Move Minutes',    val:moveMins,          unit:'min/day',   ref:'>= 30 min',  key:'move_min' },
+            { name:'Calories Burned', val:safeNum(cals),     unit:'kcal/day',  ref:'—',          key:''         },
+            { name:'Distance',        val:safeNum(dist),     unit:'m/day',     ref:'—',          key:''         },
+            { name:'Heart Points',    val:hp,                unit:'pts/day',   ref:'>= 22/day',  key:'hp'       },
+            { name:'Heart Minutes',   val:hm,                unit:'min/day',   ref:'>= 22/day',  key:'hm'       },
+            { name:'Avg Speed',       val:parseFloat(avgSpd)||0, unit:'m/s',   ref:'—',          key:''         },
+            { name:'Avg Weight',      val:parseFloat(avgWt)||0,  unit:'kg',    ref:'—',          key:''         },
+            { name:'Walking Duration',val:safeNum(walkDur),  unit:'ms/day',    ref:'—',          key:''         },
+        ];
+
+        const ltb = document.getElementById('lifestyleTableBody');
+        lifestyleRows.forEach(r => {
+            const f = r.key ? flagHtml(getFlag(r.key, r.val)) : '';
+            ltb.innerHTML += `<tr>
+                <td>${r.name}</td>
+                <td class="val-col">${r.val}${f}</td>
+                <td>${r.unit}</td>
+                <td class="ref-col">${r.ref}</td>
+            </tr>`;
+        });
+
+        // ── Bar chart — Key Metrics vs AHA Optimal ──
+        const tcN  = parseFloat(tc)    || 0;
+        const hdlN = parseFloat(hdl)   || 0;
+        const sbpN = parseFloat(sbp)   || 0;
+        const stN  = parseInt(steps)   || 0;
+        const hpN = parseFloat(String(hp).replace(/[^\d.]/g,'')) || 0;
+
+        const bars = [
+            { label:'Total Cholesterol', val:tcN,                    max:300,   unit:'mg/dL', color: tcN>200  ? '#b22222' : '#2e8b2e' },
+            { label:'HDL Cholesterol',   val:hdlN,                   max:100,   unit:'mg/dL', color: hdlN<40  ? '#e67e00' : '#2e8b2e' },
+            { label:'Systolic BP',       val:sbpN,                   max:200,   unit:'mmHg',  color: sbpN>=130? '#b22222' : '#2e8b2e' },
+            { label:'Daily Steps',       val:Math.min(stN,12000),    max:12000, unit:'steps', color: stN>=7500 ? '#2e8b2e' : '#e67e00' },
+            { label:'Heart Points',      val:Math.min(hpN,50),       max:50,    unit:'/day',  color: hpN>=22  ? '#2e8b2e' : '#e67e00' },
+        ];
+
+        const bs = document.getElementById('barSection');
+        bars.forEach(b => {
+            const pct = Math.round((b.val / b.max) * 100);
+            bs.innerHTML += `<div class="bar-row">
+                <div class="bar-meta">
+                    <span>${b.label}</span>
+                    <span class="bar-val">${b.val.toLocaleString()} ${b.unit}</span>
+                </div>
+                <div class="bar-track">
+                    <div class="bar-fill" style="width:${pct}%; background:${b.color};"></div>
+                </div>
+            </div>`;
+        });
+
+        // ── Email Report ──
+        function emailReport() {
+            const email = document.getElementById('emailInput').value.trim();
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+            alert('📧 Report will be sent to ' + email + '\n\n(Backend email integration pending.)');
+        }
+
+        // ── Download PDF (FIT ON ONE PAGE) ──
+        async function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+            const pw=210, ml=14, cw=pw-28;
+            let y=0, x=ml;
+
+            // ── RED HEADER STRIP (COMPACT) ──
+            doc.setFillColor(178,34,34);
+            doc.rect(0,0,pw,22,'F');
+            doc.setFillColor(255,255,255); doc.setGState(doc.GState({opacity:0.15}));
+            doc.rect(0,0,8,22,'F');
+            doc.setGState(doc.GState({opacity:1}));
+            doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(255,255,255);
+            doc.text('HEART RISK ASSESSMENT REPORT', ml+6, 9);
+            doc.setFont('helvetica','normal'); doc.setFontSize(7); doc.setTextColor(255,255,255);
+            doc.setGState(doc.GState({opacity:0.75}));
+            doc.text('10-Year Cardiovascular Event Risk', ml+6, 15);
+            doc.setGState(doc.GState({opacity:1}));
+            doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(255,255,255);
+            doc.text('CORVIA', pw-ml, 12, {align:'right'});
+            y=22;
+
+            // ── PATIENT INFO BAR (COMPACT) ──
+            doc.setFillColor(250,245,245);
+            doc.rect(0,y,pw,14,'F');
+            doc.setDrawColor(178,34,34); doc.setLineWidth(0.4);
+            doc.line(0,y+14,pw,y+14);
+            const reportId = document.getElementById('ptReportId').textContent;
+            const ptInfo = [['PATIENT NAME',name],['AGE / SEX',age+' yrs / '+sex],['REPORT ID',reportId],['GENERATED ON',dateStr+' · '+timeStr]];
+            const colW = cw/4;
+            ptInfo.forEach((f,i) => {
+                const px = ml+i*colW;
+                doc.setFontSize(5.5); doc.setTextColor(178,34,34); doc.setFont('helvetica','bold');
+                doc.text(f[0], px, y+4.5);
+                doc.setFontSize(7.5); doc.setTextColor(26,10,10); doc.setFont('helvetica','normal');
+                doc.text(String(f[1]), px, y+10);
+            });
+            y+=20;
+
+            // ── RISK RESULT BOX (COMPACT) ──
+            doc.setFillColor(255,248,248);
+            doc.rect(ml,y,cw,26,'F');
+            doc.setDrawColor(178,34,34); doc.setLineWidth(0.4); doc.rect(ml,y,cw,26,'S');
+            doc.setFontSize(26); doc.setFont('helvetica','bold'); doc.setTextColor(178,34,34);
+            doc.text(risk+'%', pw/2, y+13, {align:'center'});
+            doc.setFontSize(8.5); doc.setFont('helvetica','normal'); doc.setTextColor(95,61,61);
+            doc.text(category, pw/2, y+19, {align:'center'});
+            doc.setFontSize(6); doc.setTextColor(130,80,80);
+            doc.text('What your heart faces in the next decade, based on science and your daily life', pw/2, y+23.5, {align:'center'});
+            y+=32;
+
+            // helper: section header row
+            function sectionHeader(title) {
+                doc.setFillColor(178,34,34); doc.rect(ml,y,cw,5.5,'F');
+                doc.setFontSize(6.5); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
+                doc.text(title, ml+3, y+4);
+                y+=5.5;
+            }
+
+            // helper: column-header row
+            function colHeader(cols, widths) {
+                doc.setFillColor(255,245,245); doc.rect(ml,y,cw,5,'F');
+                x=ml;
+                cols.forEach((h,i) => {
+                    doc.setFontSize(5.8); doc.setFont('helvetica','bold'); doc.setTextColor(95,61,61);
+                    doc.text(h, x+2, y+3.5); x+=widths[i];
+                });
+                y+=5;
+            }
+
+            // helper: data row
+            function dataRow(cells, widths, flagCol) {
+                doc.rect(ml,y,cw,5,'F');
+                x=ml;
+                cells.forEach((v,i) => {
+                    doc.setFontSize(5.8); doc.setFont('helvetica','normal');
+                    const isFlag = (i===1 && flagCol && (String(v).includes('HIGH')||String(v).includes('▲')));
+                    doc.setTextColor(isFlag?178:26, isFlag?34:10, isFlag?34:10);
+                    doc.text(String(v), x+2, y+3.5); x+=widths[i];
+                });
+                y+=5;
+            }
+
+            const clinCols = [72, 42, 26, 42];
+
+            // ── CLINICAL PARAMETERS ──
+            sectionHeader('CLINICAL PARAMETERS');
+            colHeader(['Investigation','Result','Unit','Ref. Range'], clinCols);
+            clinicalRows.forEach((r,idx) => {
+                idx%2===1 ? doc.setFillColor(255,250,250) : doc.setFillColor(255,255,255);
+                const flagTxt = r.extra ? '▲' : (r.key ? (getFlag(r.key,r.val)||'') : '');
+                dataRow([r.name, r.val+(flagTxt?' '+flagTxt:''), r.unit, r.ref], clinCols, true);
+            });
+            y+=3;
+
+            // ── ACTIVITY DATA ──
+            sectionHeader('ACTIVITY DATA (GOOGLE FIT)');
+            colHeader(['Metric','Value','Unit','AHA Target'], clinCols);
+            lifestyleRows.forEach((r,idx) => {
+                idx%2===1 ? doc.setFillColor(255,250,250) : doc.setFillColor(255,255,255);
+                const flagTxt = r.key ? (getFlag(r.key, String(r.val))||'') : '';
+                dataRow([r.name, String(r.val)+(flagTxt?' '+flagTxt:''), r.unit, r.ref], clinCols, false);
+            });
+            y+=3;
+
+            // ── KEY METRICS BARS (COMPACT) ──
+            sectionHeader('KEY METRICS vs. AHA OPTIMAL');
+            y+=1;
+
+            bars.forEach((b, index) => {
+                // Check if we are running out of space on the page
+                if (y > 275) { 
+                    doc.addPage();
+                    y = 20;
+                }
+
+                doc.setFontSize(6); 
+                doc.setFont('helvetica', 'normal'); 
+                doc.setTextColor(26, 10, 10);
+                doc.text(b.label, ml + 2, y + 2.5);
+
+                doc.setFont('helvetica', 'bold');
+                doc.text(b.val.toLocaleString() + ' ' + b.unit, ml + cw - 2, y + 2.5, { align: 'right' });
+
+                doc.setFillColor(235, 220, 220); 
+                doc.rect(ml + 2, y + 4, cw - 4, 3, 'F');
+
+                const pct = Math.max(0.02, Math.min(b.val / b.max, 1));
+                const rgb = b.color === '#b22222' ? [178, 34, 34] : (b.color === '#2e8b2e' ? [46, 139, 46] : [200, 100, 0]);
+                
+                doc.setFillColor(rgb[0], rgb[1], rgb[2]);
+                doc.rect(ml + 2, y + 4, (cw - 4) * pct, 3, 'F');
+
+                y += 9;
+            });
+
+            // ── FOOTER ──
+            y+=4;
+            doc.setDrawColor(178,34,34); doc.setLineWidth(0.3); doc.line(ml,y,ml+cw,y);
+            doc.setFontSize(6); doc.setFont('helvetica','italic'); doc.setTextColor(170,170,170);
+            const disc='This report is for informational purposes only and does not constitute medical advice. Always consult a qualified healthcare professional.';
+            doc.text(doc.splitTextToSize(disc,cw), ml, y+4);
+
+            doc.save('CORVIA_Report_' + name.replace(/\s+/g,'_') + '.pdf');
+        }
+    </script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/corvia-chat.css') }}">
+<script src="{{ url_for('static', filename='js/corvia-chat.js') }}"></script>
+</body>
+</html>

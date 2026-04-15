@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORVIA - Book Appointment</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #b22222;
+            --primary-red-dark: #8b1a1a;
+            --pastel-red: #fff0f0;
+            --white: #ffffff;
+            --text-dark: #1a0a0a;
+            --text-mid: #5f3d3d;
+            --border: rgba(178,34,34,0.13);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--text-dark); overflow-x: hidden; }
+
+        /* ── HEADER ── */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 14px 5%; background: var(--pastel-red);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 200;
+        }
+        .logo-wrap { display: flex; align-items: center; text-decoration: none; }
+        .logo-img { height: 70px; width: auto; display: block; mix-blend-mode: multiply; }
+        nav ul { display: flex; list-style: none; gap: 32px; }
+        nav a {
+            text-decoration: none; color: var(--text-mid); font-weight: 500;
+            font-size: 15px; transition: color 0.25s; position: relative;
+        }
+        nav a:hover, nav a.active { color: var(--primary-red); }
+        nav a.active::after {
+            content: ''; position: absolute; bottom: -4px; left: 0;
+            width: 100%; height: 2px; background: var(--primary-red); border-radius: 2px;
+        }
+
+        /* ── PAGE HERO ── */
+        .page-hero {
+            background: linear-gradient(145deg, #fff8f8 0%, #ffeded 55%, #ffe0e0 100%);
+            padding: 52px 5% 44px; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .page-hero::before {
+            content: ''; position: absolute; left: 50%; top: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px; border-radius: 50%;
+            background: radial-gradient(circle, rgba(178,34,34,0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .page-hero-label {
+            display: inline-block; font-size: 11px; font-weight: 700;
+            letter-spacing: 3px; text-transform: uppercase; color: var(--primary-red);
+            margin-bottom: 16px; padding: 5px 16px;
+            border: 1px solid rgba(178,34,34,0.25); border-radius: 50px;
+        }
+        .page-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4vw, 3rem); font-weight: 800;
+            color: var(--text-dark); line-height: 1.15; margin-bottom: 14px;
+        }
+        .page-hero h1 span { color: var(--primary-red); font-style: italic; }
+        .page-hero p {
+            font-size: 1rem; color: var(--text-mid);
+            max-width: 560px; margin: 0 auto; line-height: 1.8;
+        }
+
+        /* ── MAIN SECTION ── */
+        .main-section { padding: 52px 5% 80px; background: var(--white); }
+        .main-wrap { max-width: 860px; margin: 0 auto; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── TWO COLUMN LAYOUT ── */
+        .page-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+
+        /* ── FORM CARD ── */
+        .form-card {
+            background: linear-gradient(145deg, #fff8f8, #ffeded);
+            border: 1px solid var(--border); border-radius: 22px;
+            padding: 36px 32px;
+            box-shadow: 0 10px 36px rgba(178,34,34,0.09);
+            animation: fadeUp 0.7s ease both;
+        }
+        .form-card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4rem; font-weight: 800; color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+        .form-card-title span { color: var(--primary-red); font-style: italic; }
+        .form-card-sub {
+            font-size: 0.85rem; color: var(--text-mid);
+            margin-bottom: 28px; line-height: 1.6;
+        }
+
+        .form-group { margin-bottom: 18px; }
+        .form-group label {
+            display: block; font-size: 0.78rem; font-weight: 600;
+            color: var(--text-mid); margin-bottom: 6px; letter-spacing: 0.2px;
+        }
+        .form-control {
+            width: 100%; padding: 11px 14px;
+            border: 1.5px solid rgba(178,34,34,0.2); border-radius: 10px;
+            font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+            color: var(--text-dark); background: rgba(255,255,255,0.85);
+            outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus {
+            border-color: var(--primary-red);
+            box-shadow: 0 0 0 3px rgba(178,34,34,0.08);
+            background: var(--white);
+        }
+        .form-control::placeholder { color: #c4a0a0; }
+        select.form-control {
+            appearance: none; cursor: pointer;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='7' viewBox='0 0 11 7'%3E%3Cpath d='M1 1l4.5 4.5L10 1' stroke='%23b22222' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 13px center;
+            background-color: rgba(255,255,255,0.85); padding-right: 34px;
+        }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+        .submit-btn {
+            width: 100%; padding: 13px;
+            background: var(--primary-red); color: var(--white);
+            border: none; border-radius: 50px;
+            font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 15px;
+            cursor: pointer; margin-top: 8px;
+            box-shadow: 0 4px 18px rgba(178,34,34,0.28);
+            transition: all 0.3s;
+        }
+        .submit-btn:hover {
+            background: var(--primary-red-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 24px rgba(178,34,34,0.38);
+        }
+
+        /* ── SUCCESS STATE ── */
+        .success-state {
+            display: none; text-align: center; padding: 32px 16px;
+        }
+        .success-state.visible { display: block; }
+        .success-icon { font-size: 3.5rem; display: block; margin-bottom: 16px; }
+        .success-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem; font-weight: 800; color: var(--text-dark);
+            margin-bottom: 10px;
+        }
+        .success-title span { color: var(--primary-red); font-style: italic; }
+        .success-sub { font-size: 0.9rem; color: var(--text-mid); line-height: 1.75; }
+        .success-details {
+            margin-top: 20px; padding: 16px 20px;
+            background: rgba(178,34,34,0.05); border: 1px solid var(--border);
+            border-radius: 12px; text-align: left;
+            font-size: 0.85rem; color: var(--text-mid); line-height: 2;
+        }
+        .success-details strong { color: var(--text-dark); }
+
+        /* ── SIDE PANEL ── */
+        .side-panel { animation: fadeUp 0.7s 0.15s ease both; }
+
+        .info-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 18px; padding: 24px 22px;
+            box-shadow: 0 6px 24px rgba(178,34,34,0.07);
+            margin-bottom: 20px;
+        }
+        .info-card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem; font-weight: 700; color: var(--text-dark);
+            margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+        }
+
+        .step-list { list-style: none; }
+        .step-list li {
+            display: flex; gap: 14px; align-items: flex-start;
+            padding: 10px 0; border-bottom: 1px solid rgba(178,34,34,0.07);
+            font-size: 0.85rem; color: var(--text-mid); line-height: 1.5;
+        }
+        .step-list li:last-child { border-bottom: none; }
+        .step-num {
+            width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+            background: var(--primary-red); color: var(--white);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.72rem; font-weight: 700; margin-top: 1px;
+        }
+
+        .tip-list { list-style: none; }
+        .tip-list li {
+            padding: 8px 0; border-bottom: 1px solid rgba(178,34,34,0.07);
+            font-size: 0.83rem; color: var(--text-mid); line-height: 1.5;
+            display: flex; gap: 10px; align-items: flex-start;
+        }
+        .tip-list li:last-child { border-bottom: none; }
+        .tip-icon { font-size: 1rem; flex-shrink: 0; }
+
+        /* ── VIEW APPOINTMENTS ── */
+        .appointments-section {
+            margin-top: 48px; padding-top: 40px;
+            border-top: 1px solid rgba(178,34,34,0.12);
+            animation: fadeUp 0.7s 0.2s ease both;
+        }
+        .appt-section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem; font-weight: 800; color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+        .appt-section-title span { color: var(--primary-red); font-style: italic; }
+        .appt-section-sub { font-size: 0.85rem; color: var(--text-mid); margin-bottom: 20px; }
+
+        .load-btn {
+            padding: 11px 28px;
+            background: transparent; color: var(--primary-red);
+            border: 2px solid var(--primary-red); border-radius: 50px;
+            font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: all 0.3s; margin-bottom: 20px;
+        }
+        .load-btn:hover { background: var(--primary-red); color: var(--white); }
+
+        .appt-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+        .appt-card {
+            background: var(--white); border: 1px solid var(--border);
+            border-radius: 14px; padding: 18px 16px;
+            box-shadow: 0 4px 16px rgba(178,34,34,0.06);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .appt-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(178,34,34,0.11); }
+
+        .appt-card-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .appt-hospital {
+            font-family: 'Playfair Display', serif;
+            font-size: 0.92rem; font-weight: 700; color: var(--text-dark); line-height: 1.3;
+        }
+        .appt-status {
+            font-size: 0.65rem; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; padding: 3px 9px; border-radius: 20px;
+            background: rgba(178,34,34,0.08); color: var(--primary-red);
+            border: 1px solid rgba(178,34,34,0.2); white-space: nowrap; flex-shrink: 0;
+        }
+        .appt-detail {
+            font-size: 0.8rem; color: var(--text-mid); line-height: 1.8;
+            display: flex; align-items: center; gap: 6px;
+        }
+
+        .no-appts {
+            text-align: center; padding: 32px 20px;
+            border: 1.5px dashed rgba(178,34,34,0.2); border-radius: 14px;
+            color: var(--text-mid); font-size: 0.88rem; line-height: 1.7;
+        }
+        .no-appts-icon { font-size: 2rem; display: block; margin-bottom: 10px; }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .page-grid { grid-template-columns: 1fr; }
+            .appt-grid  { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 600px) {
+            nav ul { gap: 18px; }
+            nav a  { font-size: 13px; }
+            .logo-img { height: 54px; }
+            .form-row { grid-template-columns: 1fr; }
+            .form-card { padding: 24px 18px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── HEADER ── -->
+    <header>
+        <a href="/about" class="logo-wrap">
+                        <img src="{{ url_for('static', filename='FYP Logo (1).png') }}" alt="CORVIA" class="logo-img">
+
+        </a>
+        <nav>
+            <ul>
+                <li><a href="/mission">Mission</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/risk-check">Risk Check</a></li>
+                <li><a href="/my-report">My Report</a></li>
+                <li><a href="/find-hospital">Find Hospital</a></li>
+                <li><a href="/book-appointment" class="active">Book Appointment</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ── PAGE HERO ── -->
+    <div class="page-hero">
+        <div class="page-hero-label">Schedule Your Visit</div>
+        <h1>Book Your <span>Heart Appointment</span></h1>
+        <p>Take the next step toward better heart health. Fill in your details below and we'll confirm your appointment with the hospital.</p>
+    </div>
+
+    <!-- ── MAIN ── -->
+    <section class="main-section">
+        <div class="main-wrap">
+
+            <div class="page-grid">
+
+                <!-- LEFT: Booking form -->
+                <div class="form-card">
+
+                    <!-- Form view -->
+                    <div id="formView">
+                        <div class="form-card-title">Your <span>Appointment</span></div>
+                        <div class="form-card-sub">Fill in your details. The hospital will contact you to confirm your slot.</div>
+
+                        <div class="form-group">
+                            <label>Your Full Name *</label>
+                            <input type="text" class="form-control" id="patName" placeholder="e.g. Priya Sharma">
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Phone Number *</label>
+                                <input type="tel" class="form-control" id="patPhone" placeholder="+91 98765 43210">
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <input type="email" class="form-control" id="patEmail" placeholder="you@email.com">
+                            </div>
+                        </div>
+
+                        <!---->
+
+                        
+
+                        <div class="form-group">
+                            <label>Speciality Needed *</label>
+                            <select class="form-control" id="patSpeciality">
+                                <option value="">Select speciality</option>
+                                <option>Cardiology</option>
+                                <option>Cardiac Surgery</option>
+                                <option>Interventional Cardiology</option>
+                                <option>Electrophysiology</option>
+                                <option>Heart Transplant</option>
+                                <option>Preventive Cardiology</option>
+                                <option>General Physician</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Preferred Date *</label>
+                                <input type="date" class="form-control" id="patDate">
+                            </div>
+                            <div class="form-group">
+                                <label>Preferred Time</label>
+                                <input type="time" class="form-control" id="patTime">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Reason / Notes</label>
+                            <input type="text" class="form-control" id="patReason" placeholder="e.g. Follow-up after risk assessment">
+                        </div>
+
+                        <button class="submit-btn" onclick="submitAppointment()">📅 Confirm Booking</button>
+                    </div>
+
+                    <!-- Success view -->
+                    <div class="success-state" id="successView">
+                        <span class="success-icon">✅</span>
+                        <div class="success-title">Appointment <span>Requested!</span></div>
+                        <div class="success-sub">
+                            Your booking has been saved successfully.<br>
+                            The hospital will contact you within 24 hours to confirm your slot.
+                        </div>
+                        <div class="success-details" id="successDetails"></div>
+                        <button class="submit-btn" style="margin-top:20px;" onclick="resetForm()">Book Another →</button>
+                    </div>
+
+                </div>
+
+                <!-- RIGHT: Info panel -->
+                <div class="side-panel">
+
+                    <div class="info-card">
+                        <div class="info-card-title">📋 How It Works</div>
+                        <ul class="step-list">
+                            <li>
+                                <span class="step-num">1</span>
+                                <span>Fill in your personal details and choose your preferred hospital and speciality.</span>
+                            </li>
+                            <li>
+                                <span class="step-num">2</span>
+                                <span>Select your preferred date and time — the hospital will confirm your exact slot.</span>
+                            </li>
+                            <li>
+                                <span class="step-num">3</span>
+                                <span>The hospital contacts you within 24 hours via phone or email to confirm.</span>
+                            </li>
+                            <li>
+                                <span class="step-num">4</span>
+                                <span>Attend your appointment. Bring your CORVIA risk report for the cardiologist.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-title">💡 Before Your Visit</div>
+                        <ul class="tip-list">
+                            <li><span class="tip-icon">📄</span> Download your CORVIA My Report and bring it along — it gives your doctor a full clinical summary.</li>
+                            <li><span class="tip-icon">💊</span> Carry a list of all current medications and dosages.</li>
+                            <li><span class="tip-icon">🩸</span> If possible, fast for 8–10 hours before lipid panel blood tests.</li>
+                            <li><span class="tip-icon">📞</span> Call the hospital if you need to reschedule at least 24 hours in advance.</li>
+                            <li><span class="tip-icon">❤️</span> Note any recent symptoms — chest pain, breathlessness, palpitations — to share with your doctor.</span></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ── VIEW APPOINTMENTS ── -->
+            <div class="appointments-section">
+                <div class="appt-section-title">Your <span>Appointments</span></div>
+                <div class="appt-section-sub">All your previously booked appointments are listed below.</div>
+                <button class="load-btn" onclick="loadAppointments()">Load My Appointments</button>
+                <div id="appointmentsArea"></div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        // ── Pre-fill hospital from URL query param ──────────────
+        const params = new URLSearchParams(window.location.search);
+        const hospitalParam = params.get('hospital');
+        if (hospitalParam) {
+            document.getElementById('patHospital').value = hospitalParam;
+        }
+
+        // ── Submit appointment to Flask API ──────────────────────
+        async function submitAppointment() {
+            const name      = document.getElementById('patName').value.trim();
+            const phone     = document.getElementById('patPhone').value.trim();
+            const hospital  = document.getElementById('patHospital').value.trim();
+            const speciality= document.getElementById('patSpeciality').value;
+            const date      = document.getElementById('patDate').value;
+            const time      = document.getElementById('patTime').value;
+            const reason    = document.getElementById('patReason').value.trim();
+
+            if (!name || !phone || !hospital || !speciality || !date) {
+                alert('Please fill in all required fields (*).');
+                return;
+            }
+
+            const btn = document.querySelector('.submit-btn');
+            btn.textContent = 'Saving…';
+            btn.disabled = true;
+
+            try {
+                const res = await fetch('/api/book_appointment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        patient_name:  name,
+                        hospital_name: hospital,
+                        specialty:     speciality,
+                        date:          date,
+                        time:          time,
+                        phone:         phone,
+                        reason:        reason,
+                    })
+                });
+                const data = await res.json();
+
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    btn.textContent = '📅 Confirm Booking';
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Show success
+                document.getElementById('successDetails').innerHTML =
+                    '<strong>Patient:</strong> ' + name + '<br>' +
+                    '<strong>Hospital:</strong> ' + hospital + '<br>' +
+                    '<strong>Speciality:</strong> ' + speciality + '<br>' +
+                    '<strong>Date:</strong> ' + date + (time ? ' at ' + time : '') + '<br>' +
+                    '<strong>Booking ID:</strong> #' + (data.id || '—');
+
+                document.getElementById('formView').style.display = 'none';
+                document.getElementById('successView').classList.add('visible');
+
+            } catch (err) {
+                alert('Network error: ' + err.message);
+                btn.textContent = '📅 Confirm Booking';
+                btn.disabled = false;
+            }
+        }
+
+        // ── Reset form ────────────────────────────────────────────
+        function resetForm() {
+            document.getElementById('formView').style.display = 'block';
+            document.getElementById('successView').classList.remove('visible');
+            document.getElementById('patName').value = '';
+            document.getElementById('patPhone').value = '';
+            document.getElementById('patEmail').value = '';
+            document.getElementById('patHospital').value = '';
+            document.getElementById('patSpeciality').value = '';
+            document.getElementById('patDate').value = '';
+            document.getElementById('patTime').value = '';
+            document.getElementById('patReason').value = '';
+            document.querySelector('.submit-btn').textContent = '📅 Confirm Booking';
+            document.querySelector('.submit-btn').disabled = false;
+        }
+
+        // ── Load appointments from API ────────────────────────────
+        async function loadAppointments() {
+            const area = document.getElementById('appointmentsArea');
+            area.innerHTML = '<p style="color:var(--text-mid);font-size:.88rem;">Loading…</p>';
+
+            try {
+                const res  = await fetch('/api/view_appointments');
+                const data = await res.json();
+                const list = data.appointments || [];
+
+                if (!list.length) {
+                    area.innerHTML =
+                        '<div class="no-appts">' +
+                        '<span class="no-appts-icon">📭</span>' +
+                        'No appointments found yet.<br>Book your first appointment above.' +
+                        '</div>';
+                    return;
+                }
+
+                let html = '<div class="appt-grid">';
+                list.forEach(a => {
+                    const dateStr = a.date ? a.date : '—';
+                    const timeStr = a.time ? ' · ' + a.time : '';
+                    html +=
+                        '<div class="appt-card">' +
+                            '<div class="appt-card-header">' +
+                                '<div class="appt-hospital">' + (a.hospital_name || a.hospital || '—') + '</div>' +
+                                '<span class="appt-status">' + (a.status || 'Pending') + '</span>' +
+                            '</div>' +
+                            '<div class="appt-detail">👤 ' + (a.patient_name || '—') + '</div>' +
+                            '<div class="appt-detail">🏥 ' + (a.specialty || '—') + '</div>' +
+                            '<div class="appt-detail">📅 ' + dateStr + timeStr + '</div>' +
+                            '<div class="appt-detail">📞 ' + (a.phone || '—') + '</div>' +
+                        '</div>';
+                });
+                html += '</div>';
+                area.innerHTML = html;
+
+            } catch (err) {
+                area.innerHTML = '<p style="color:#b22222;font-size:.88rem;">Failed to load: ' + err.message + '</p>';
+            }
+        }
+    </script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/corvia-chat.css') }}">
+<script src="{{ url_for('static', filename='js/corvia-chat.js') }}"></script>
+</body>
+</html>

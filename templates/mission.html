@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CORVIA - Our Mission</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-red: #b22222;
+            --primary-red-dark: #8b1a1a;
+            --pastel-red: #fff0f0;
+            --white: #ffffff;
+            --text-dark: #1a0a0a;
+            --text-mid: #5f3d3d;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--white);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* ── HEADER ── */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 5%;
+            background: var(--pastel-red);
+            border-bottom: 1px solid rgba(178,34,34,0.12);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-wrap {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            height: 70px;
+            width: auto;
+            display: block;
+            mix-blend-mode: multiply;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-mid);
+            font-weight: 500;
+            font-size: 15px;
+            letter-spacing: 0.3px;
+            transition: color 0.25s;
+            position: relative;
+        }
+
+        nav a:hover, nav a.active { color: var(--primary-red); }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary-red);
+            border-radius: 2px;
+        }
+
+        /* ── HERO ── */
+        .hero-mission {
+            min-height: 88vh;
+            background: linear-gradient(145deg, #fff8f8 0%, #ffeded 60%, #ffe0e0 100%);
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-mission::before {
+            content: '';
+            position: absolute;
+            right: -80px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 550px;
+            height: 550px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(178,34,34,0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 5%;
+            width: 100%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-split {
+            display: grid;
+            grid-template-columns: 1fr 0.9fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        /* ── LEFT ── */
+        .hero-left { animation: fadeUp 0.9s ease both; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.2rem, 4vw, 3.4rem);
+            font-weight: 800;
+            line-height: 1.15;
+            color: var(--text-dark);
+            margin-bottom: 28px;
+        }
+
+        .hero-title .accent {
+            color: var(--primary-red);
+            font-style: italic;
+        }
+
+        .hero-title .line-break { display: block; }
+
+        .hero-paragraph {
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: var(--text-mid);
+            font-weight: 400;
+            max-width: 540px;
+            margin-bottom: 36px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 13px 28px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--primary-red);
+            color: var(--white);
+            box-shadow: 0 4px 20px rgba(178,34,34,0.3);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-red-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(178,34,34,0.4);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-red);
+            border: 2px solid var(--primary-red);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-red);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* ── RIGHT IMAGE ── */
+        .hero-right {
+            position: relative;
+            animation: fadeUp 0.9s 0.2s ease both;
+        }
+
+        .image-frame {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(178,34,34,0.18), 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .hero-img {
+            width: 100%;
+            height: 320px;
+            object-fit: cover;
+            object-position: center top;
+            display: block;
+            border-radius: 20px;
+        }
+
+        .image-overlay {
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 50%;
+            background: linear-gradient(to top, rgba(100,10,10,0.65), transparent);
+            border-radius: 0 0 20px 20px;
+            pointer-events: none;
+        }
+
+        .image-caption {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            color: #fff;
+        }
+
+        .image-caption .cap-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 5px;
+        }
+
+        .image-caption .cap-sub {
+            font-size: 0.82rem;
+            opacity: 0.85;
+            letter-spacing: 0.4px;
+        }
+
+        .stat-card {
+            position: absolute;
+            top: -18px;
+            right: -18px;
+            background: var(--white);
+            border-radius: 14px;
+            padding: 14px 18px;
+            box-shadow: 0 10px 30px rgba(178,34,34,0.15);
+            text-align: center;
+            min-width: 110px;
+            animation: float 3s ease-in-out infinite;
+            z-index: 3;
+        }
+
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50%      { transform: translateY(-8px); }
+        }
+
+        .stat-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: var(--primary-red);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-mid);
+            font-weight: 500;
+            margin-top: 3px;
+            line-height: 1.3;
+        }
+
+        /* ══════════════════════════════════════
+           SECTION: PILLARS (Science / Human / Data)
+        ══════════════════════════════════════ */
+        .pillars-section {
+            background: var(--white);
+            padding: 70px 5%;
+        }
+
+        .pillars-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            border: 1.5px solid rgba(178,34,34,0.15);
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .pillar-card {
+            padding: 40px 32px;
+            background: var(--white);
+            border-right: 1.5px solid rgba(178,34,34,0.1);
+            transition: background 0.3s;
+            text-align: center;
+        }
+
+        .pillar-card:last-child { border-right: none; }
+
+        .pillar-card:hover { background: #fff5f5; }
+
+        .pillar-icon {
+            font-size: 2rem;
+            margin-bottom: 14px;
+        }
+
+        .pillar-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary-red);
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-style: normal;
+        }
+
+        .pillar-sub {
+            font-size: 0.82rem;
+            color: var(--text-mid);
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .pillar-desc {
+            font-size: 0.88rem;
+            color: #7a5a5a;
+            line-height: 1.6;
+        }
+
+        /* ══════════════════════════════════════
+           SECTION: STATS BAR
+        ══════════════════════════════════════ */
+        .stats-bar {
+            background: linear-gradient(135deg, #b22222 0%, #8b1a1a 100%);
+            padding: 50px 5%;
+        }
+
+        .stats-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 20px;
+            border-right: 1px solid rgba(255,255,255,0.15);
+        }
+
+        .stat-item:last-child { border-right: none; }
+
+        .stat-item .s-icon {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .stat-item .s-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-item .s-label {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.75);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* ══════════════════════════════════════
+           SECTION: WHY CORVIA
+        ══════════════════════════════════════ */
+        .why-section {
+            padding: 80px 5%;
+            background: #fffafa;
+        }
+
+        .why-inner {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .section-label {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--primary-red);
+            margin-bottom: 18px;
+            padding: 5px 16px;
+            border: 1px solid rgba(178,34,34,0.25);
+            border-radius: 50px;
+        }
+
+        .why-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.6rem);
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .why-title .accent { color: var(--primary-red); font-style: italic; }
+
+        .why-body {
+            font-size: 1.05rem;
+            line-height: 1.9;
+            color: var(--text-mid);
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        /* ══════════════════════════════════════
+           SECTION: TESTIMONIAL
+        ══════════════════════════════════════ */
+        .testimonial-section {
+            padding: 70px 5%;
+            background: var(--white);
+        }
+
+        .testimonial-inner {
+            max-width: 760px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .quote-mark {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            color: rgba(178,34,34,0.12);
+            line-height: 0.5;
+            margin-bottom: 24px;
+            display: block;
+            user-select: none;
+        }
+
+        .quote-text {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.2rem, 2.5vw, 1.55rem);
+            font-style: italic;
+            color: var(--text-dark);
+            line-height: 1.65;
+            margin-bottom: 28px;
+        }
+
+        .quote-author {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .author-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e8a5a5, #b22222);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .author-info .name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+        }
+
+        .author-info .role {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+        }
+
+        /* ══════════════════════════════════════
+           SECTION: FINAL CTA
+        ══════════════════════════════════════ */
+        .cta-section {
+            padding: 80px 5%;
+            background: linear-gradient(135deg, #fff0f0 0%, #ffe0e0 100%);
+            text-align: center;
+        }
+
+        .cta-inner { max-width: 700px; margin: 0 auto; }
+
+        .cta-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.6rem, 3vw, 2.4rem);
+            font-weight: 800;
+            color: var(--text-dark);
+            margin-bottom: 14px;
+            line-height: 1.25;
+        }
+
+        .cta-title .accent { color: var(--primary-red); font-style: italic; }
+
+        .cta-sub {
+            font-size: 1rem;
+            color: var(--text-mid);
+            margin-bottom: 34px;
+            line-height: 1.7;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 14px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 900px) {
+            .hero-split { grid-template-columns: 1fr; gap: 40px; }
+            .hero-right { order: -1; }
+            .stat-card { top: -12px; right: -12px; }
+            .pillars-grid { grid-template-columns: 1fr; }
+            .pillar-card { border-right: none; border-bottom: 1.5px solid rgba(178,34,34,0.1); }
+            .pillar-card:last-child { border-bottom: none; }
+            .stats-inner { grid-template-columns: 1fr; }
+            .stat-item { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .stat-item:last-child { border-bottom: none; }
+        }
+
+        @media (max-width: 600px) {
+            nav ul { gap: 18px; }
+            nav a { font-size: 13px; }
+            .logo-img { height: 54px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ── HEADER ── -->
+    <header>
+        <a href="/about" class="logo-wrap">
+            <img src="{{ url_for('static', filename='FYP Logo (1).png') }}" alt="CORVIA" class="logo-img">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="/mission">Mission</a></li>
+                <li><a href="/about">About</a></li>
+                <li><a href="/risk-check">Risk Check</a></li>
+                <li><a href="/my-report">My Report</a></li>
+                <li><a href="/find-hospital">Find Hospital</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+
+    <!-- ── HERO ── -->
+    <section class="hero-mission">
+        <div class="container">
+            <div class="hero-split">
+
+                <!-- LEFT -->
+                <div class="hero-left">
+                    <h1 class="hero-title">
+                        <span class="line-break">Be the reason</span>
+                        <span class="line-break accent">someone survives.</span>
+                    </h1>
+
+                    <p class="hero-paragraph">
+                        Your Heart Has Been Talking. Google Fit Has Been Listening. CORVIA Finally Translates.
+                        Seventy years of American Heart Association clinical excellence. A lifetime of your Google Fit data. 
+                        CORVIA is where they converge - transforming 10-year heart risk prediction from abstract calculation into personal revelation. 
+                        Because the story of your heart isn't found in charts and graphs. It's found in the path your feet have walked.
+                    </p>
+
+                    <div class="button-group">
+                        <a href="#mission-story" class="btn btn-primary">Discover How</a>
+                        <a href="/risk-check" class="btn btn-outline">Know Your Risk</a>
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="hero-right">
+                    <div class="stat-card">
+                        <div class="stat-number">50,000+</div>
+                        <div class="stat-label">patients validated</div>
+                    </div>
+
+                    <div class="image-frame">
+                        <img src="{{ url_for('static', filename='survival.jpg (1).jpeg') }}" alt="CPR Survival" class="hero-img">
+                        <div class="image-overlay"></div>
+                        <div class="image-caption">
+                            <div class="cap-title">Every second counts.</div>
+                            <div class="cap-sub">Early prediction saves lives - know your risk today.</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ── PILLARS: Science / Human / Data ── -->
+    <section class="pillars-section" id="mission-story">
+        <div class="pillars-inner">
+            <div class="pillars-grid">
+
+                <div class="pillar-card">
+                    <div class="pillar-title">Clinically Grounded</div>
+                    <div class="pillar-sub">Built on 70 years of AHA research</div>
+                    <p class="pillar-desc">Every prediction is grounded in the 2013 ACC/AHA Pooled Cohort Equations - the gold standard in cardiovascular risk science.</p>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-title">Patient-Centered</div>
+                    <div class="pillar-sub">Your lifestyle matters</div>
+                    <p class="pillar-desc">CORVIA recognises that you are more than clinical numbers. Your daily movement, habits and choices shape your heart's future.</p>
+                </div>
+
+                <div class="pillar-card">
+                    <div class="pillar-title">Evidence-Informed</div>
+                    <div class="pillar-sub">Powered by your Google Fit data</div>
+                    <p class="pillar-desc">By fusing wearable activity data with clinical parameters, CORVIA delivers a risk prediction that is deeply, unmistakably personal.</p>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- ── STATS BAR ── -->
+    <section class="stats-bar">
+        <div class="stats-inner">
+
+            <div class="stat-item">
+                <div class="s-num">50,000+</div>
+                <div class="s-label">Profiles Validated</div>
+            </div>
+
+            <div class="stat-item">
+                <div class="s-num">96.4%</div>
+                <div class="s-label">Category Accuracy</div>
+            </div>
+
+            <div class="stat-item">
+                <div class="s-num">30 sec</div>
+                <div class="s-label">To Know Your Risk</div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ── WHY CORVIA ── -->
+    <section class="why-section">
+        <div class="why-inner">
+            <span class="section-label">Why CORVIA?</span>
+            <h2 class="why-title">
+                Heart disease doesn't<br>
+                <span class="accent">announce itself.</span>
+            </h2>
+            <p class="why-body">
+                It builds quietly over years - in the steps not taken, the checkups skipped, the numbers never checked.
+                CORVIA helps you read your story <em>before</em> it's too late. Because knowing is the first act of survival.
+            </p>
+        </div>
+    </section>
+
+    <!-- ── TESTIMONIAL ── -->
+    <section class="testimonial-section">
+        <div class="testimonial-inner">
+            <span class="quote-mark">"</span>
+            <p class="quote-text">
+                CORVIA showed me that the life I've already lived has shaped my heart's future.
+            </p>
+            <div class="quote-author">
+                <div class="author-avatar">S</div>
+                <div class="author-info">
+                    <div class="name">Samaira, 42</div>
+                    <div class="role">CORVIA User</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ── FINAL CTA ── -->
+    <section class="cta-section">
+        <div class="cta-inner">
+            <h2 class="cta-title">
+                Every second counts.<br>
+                <span class="accent">Know your risk today.</span>
+            </h2>
+            <p class="cta-sub">Early prediction saves lives. It takes 30 seconds - and it could change everything.</p>
+            <div class="cta-buttons">
+                <a href="/risk-check" class="btn btn-outline">Know Your Risk</a>
+            </div>
+        </div>
+    </section>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/corvia-chat.css') }}">
+<script src="{{ url_for('static', filename='js/corvia-chat.js') }}"></script>
+</body>
+</html>

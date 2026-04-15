@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>CorVia — Heart Risk Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,300&family=DM+Mono:wght@300;400;500&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+
+<!-- ── BACKGROUND LAYERS ── -->
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="bg-glow" aria-hidden="true"></div>
+
+<!-- ── TOPBAR ── -->
+<header class="topbar" role="banner">
+  <div class="topbar-brand">
+    <div class="brand-icon" aria-hidden="true">❤️</div>
+    <div class="brand-text">
+      <span class="brand-name">CorVia</span>
+      <span class="brand-tag">Heart Intelligence</span>
+    </div>
+  </div>
+
+  <nav class="topbar-nav" role="navigation" aria-label="Main navigation">
+    <button class="nav-btn active" data-section="assess" aria-current="page">
+      <span class="nav-icon">◈</span> Assessment
+    </button>
+    <button class="nav-btn" data-section="results">
+      <span class="nav-icon">◈</span> Results
+    </button>
+    <button class="nav-btn" data-section="doctors">
+      <span class="nav-icon">◈</span> Doctors
+    </button>
+    <button class="nav-btn" data-section="hospital">
+      <span class="nav-icon">◈</span> Hospital
+    </button>
+  </nav>
+
+  <div class="topbar-right">
+    <div class="status-pill">
+      <span class="status-dot"></span>
+      <span class="status-text">Model ready</span>
+    </div>
+  </div>
+</header>
+
+<!-- ── APP SHELL: main content + sidebar ── -->
+<div class="app-shell">
+
+<!-- ── MAIN ── -->
+<main class="main" role="main">
+
+<!-- ════════════════════════════════════════════
+     SECTION 1 — ASSESSMENT
+════════════════════════════════════════════ -->
+<section id="assess" class="section active" aria-label="Assessment">
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span class="eyebrow-dot"></span>
+        AHA / ACC Clinical Guidelines · XGBoost AI
+      </div>
+      <h1 class="hero-title">
+        Know your<br>
+        <em class="hero-em">heart risk.</em>
+      </h1>
+      <p class="hero-sub">
+        Clinically validated 10-year cardiovascular risk assessment.
+        Enter your health parameters below to get your personalised score.
+      </p>
+      <div class="hero-stats">
+        <div class="hs-item"><span class="hs-num">50k</span><span class="hs-label">Profiles</span></div>
+        <div class="hs-div"></div>
+        <div class="hs-item"><span class="hs-num">96%</span><span class="hs-label">Accuracy</span></div>
+        <div class="hs-div"></div>
+        <div class="hs-item"><span class="hs-num">4</span><span class="hs-label">Risk tiers</span></div>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hv-ring hv-ring-1"></div>
+      <div class="hv-ring hv-ring-2"></div>
+      <div class="hv-ring hv-ring-3"></div>
+      <div class="hv-core">
+        <span class="hv-icon">❤️</span>
+      </div>
+      <svg class="ecg-path" viewBox="0 0 320 60">
+        <polyline points="0,30 50,30 65,30 73,6 80,54 87,30 140,30 155,30 163,6 170,54 177,30 230,30 245,30 253,6 260,54 267,30 320,30"
+          fill="none" stroke="rgba(211,47,47,0.6)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Form grid -->
+  <form id="assess-form" class="form-grid" novalidate>
+
+    <!-- Card 1: Clinical -->
+    <div class="form-card">
+      <div class="fc-header">
+        <div class="fc-number">01</div>
+        <div>
+          <div class="fc-title">Clinical Parameters</div>
+          <div class="fc-sub">Essential health indicators</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="flabel">Age</label>
+          <input class="finput" type="number" id="age" min="18" max="90" value="52" required aria-required="true">
+        </div>
+        <div class="field">
+          <label class="flabel">Biological sex</label>
+          <select class="finput" id="sex" aria-label="Biological sex">
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="young-notice" class="notice notice-info" style="display:none" role="alert">
+        <span class="notice-icon">ℹ</span>
+        Under 30: model is validated for 30+. Results are estimates — focus on building healthy habits now.
+      </div>
+
+      <!-- Cholesterol toggle -->
+      <div class="toggle-group">
+        <span class="flabel">Cholesterol source</span>
+        <div class="toggle-pills">
+          <label class="toggle-pill active" id="pill-manual">
+            <input type="radio" name="chol_method" value="manual" checked hidden>
+            Enter values
+          </label>
+          <label class="toggle-pill" id="pill-estimate">
+            <input type="radio" name="chol_method" value="estimate" hidden>
+            Age estimate
+          </label>
+        </div>
+      </div>
+
+      <div id="chol-manual" class="field-row">
+        <div class="field">
+          <label class="flabel">Total Cholesterol <span class="unit">mg/dL</span></label>
+          <input class="finput" type="number" id="total_chol" min="100" max="400" value="210">
+        </div>
+        <div class="field">
+          <label class="flabel">HDL Cholesterol <span class="unit">mg/dL</span></label>
+          <input class="finput" type="number" id="hdl_chol" min="20" max="100" value="44">
+        </div>
+      </div>
+      <div id="chol-estimate" class="estimate-chip" style="display:none">
+        <span class="ec-icon">≈</span>
+        <span id="estimate-text">Values will appear here</span>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="flabel">Systolic BP <span class="unit">mmHg</span></label>
+          <input class="finput" type="number" id="sys_bp" min="80" max="200" value="135">
+        </div>
+        <div class="field">
+          <label class="flabel">Diastolic BP <span class="unit">mmHg</span></label>
+          <input class="finput" type="number" id="dia_bp" min="50" max="130" value="85">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label class="flabel">BP Medication</label>
+          <select class="finput" id="on_med">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="flabel">Diabetes</label>
+          <select class="finput" id="diabetes">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="flabel">Smoking status</label>
+        <select class="finput" id="smoker">
+          <option value="never">Non-smoker</option>
+          <option value="current">Current smoker</option>
+          <option value="former">Former smoker</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Card 2: Activity -->
+    <div class="form-card">
+      <div class="fc-header">
+        <div class="fc-number">02</div>
+        <div>
+          <div class="fc-title">Activity Data <span class="optional-badge">Optional</span></div>
+          <div class="fc-sub">Google Fit metrics · leave at 0 if unavailable</div>
+        </div>
+      </div>
+
+      <!-- CSV Upload -->
+      <div class="csv-upload-zone" id="csv-zone">
+        <input type="file" id="csv-file" accept=".csv" hidden>
+        <div class="csv-drop-area" id="csv-drop" onclick="document.getElementById('csv-file').click()">
+          <div class="cda-icon">⬆</div>
+          <div class="cda-title">Upload Google Fit CSV</div>
+          <div class="cda-sub">Click to browse or drag & drop · .csv only · auto-fills all fields</div>
+        </div>
+        <div class="csv-status" id="csv-status" style="display:none"></div>
+      </div>
+
+      <div class="activity-grid">
+        <div class="act-field">
+          <label class="flabel">Daily Steps</label>
+          <input class="finput" type="number" id="steps" min="0" value="0" step="100">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Move Minutes</label>
+          <input class="finput" type="number" id="move_min" min="0" value="0">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Calories <span class="unit">kcal</span></label>
+          <input class="finput" type="number" id="calories" min="0" value="0">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Distance <span class="unit">m</span></label>
+          <input class="finput" type="number" id="distance" min="0" value="0">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Heart Points</label>
+          <input class="finput" type="number" id="hp" min="0" value="0">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Heart Minutes</label>
+          <input class="finput" type="number" id="hm" min="0" value="0">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Avg Speed <span class="unit">m/s</span></label>
+          <input class="finput" type="number" id="avg_spd" min="0" value="0" step="0.1">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Max Speed <span class="unit">m/s</span></label>
+          <input class="finput" type="number" id="max_spd" min="0" value="0" step="0.1">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Min Speed <span class="unit">m/s</span></label>
+          <input class="finput" type="number" id="min_spd" min="0" value="0" step="0.1">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Avg Weight <span class="unit">kg</span></label>
+          <input class="finput" type="number" id="avg_wt" min="0" value="0" step="0.5">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Max Weight <span class="unit">kg</span></label>
+          <input class="finput" type="number" id="max_wt" min="0" value="0" step="0.5">
+        </div>
+        <div class="act-field">
+          <label class="flabel">Min Weight <span class="unit">kg</span></label>
+          <input class="finput" type="number" id="min_wt" min="0" value="0" step="0.5">
+        </div>
+        <div class="act-field" style="grid-column:1/-1">
+          <label class="flabel">Walking Duration <span class="unit">ms</span></label>
+          <input class="finput" type="number" id="walk_dur" min="0" value="0" step="100000">
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-wrap">
+        <div class="submit-hint">Results are for educational purposes only</div>
+        <button type="submit" class="submit-btn" id="calc-btn">
+          <span id="calc-label">Calculate my heart risk</span>
+          <span id="calc-icon" class="btn-arrow">→</span>
+          <span id="calc-spinner" class="btn-spinner" style="display:none"></span>
+        </button>
+      </div>
+    </div>
+
+  </form>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SECTION 2 — RESULTS
+════════════════════════════════════════════ -->
+<section id="results" class="section" aria-label="Results">
+
+  <div id="no-results" class="empty-state">
+    <div class="es-icon">⟳</div>
+    <div class="es-title">No assessment yet</div>
+    <div class="es-sub">Complete the assessment form to see your personalised results.</div>
+    <button class="pill-cta" onclick="switchSection('assess')">Go to assessment →</button>
+  </div>
+
+  <div id="results-content" style="display:none">
+
+    <!-- Score hero band -->
+    <div class="score-band" id="score-band">
+      <div class="sb-left">
+        <div class="sb-eyebrow">10-Year Cardiovascular Risk</div>
+        <div class="sb-score" id="sb-score">—</div>
+        <div class="sb-category" id="sb-category">—</div>
+      </div>
+      <div class="sb-middle">
+        <canvas id="gaugeChart" width="260" height="140"></canvas>
+      </div>
+      <div class="sb-right">
+        <button class="download-pdf-btn" onclick="downloadResultPDF()" style="margin-bottom: 1rem;">
+        <span class="btn-icon">⤓</span> Download Clinical Report
+      </button>
+        <div class="sb-metric">
+          <div class="sbm-val" id="sbm-baseline">—</div>
+          <div class="sbm-label">Peer baseline</div>
+        </div>
+        <div class="sb-metric">
+          <div class="sbm-val" id="sbm-diff">—</div>
+          <div class="sbm-label">vs. average</div>
+        </div>
+        <div class="sb-metric green">
+          <div class="sbm-val" id="sbm-proj">—</div>
+          <div class="sbm-label">10yr projected</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AHA Scale -->
+    <div class="aha-track">
+      <div class="aha-label-left">Lower risk</div>
+      <div class="aha-bar">
+        <div class="aha-seg seg-low"  id="seg-low">  <span>Low</span><span class="seg-range">&lt;5%</span></div>
+        <div class="aha-seg seg-bord" id="seg-bord"> <span>Borderline</span><span class="seg-range">5–7.5%</span></div>
+        <div class="aha-seg seg-inter"id="seg-inter"><span>Intermediate</span><span class="seg-range">7.5–20%</span></div>
+        <div class="aha-seg seg-high" id="seg-high"> <span>High</span><span class="seg-range">≥20%</span></div>
+      </div>
+      <div class="aha-label-right">Higher risk</div>
+    </div>
+
+    <!-- Chart row -->
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="cc-title">Risk vs. Population</div>
+        <canvas id="compBar" height="160"></canvas>
+      </div>
+      <div class="chart-card chart-card-wide">
+        <div class="cc-title">Risk Reduction Potential</div>
+        <canvas id="trendLine" height="160"></canvas>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="result-tabs">
+      <button class="rtab active" data-tab="drivers">Risk Drivers</button>
+      <button class="rtab" data-tab="recs">Recommendations</button>
+      <button class="rtab" data-tab="plan">6-Month Plan</button>
+    </div>
+
+    <!-- Tab: Drivers -->
+    <div id="tab-drivers" class="rtab-pane active">
+      <div class="chart-card" style="margin-top:0">
+        <div class="cc-title">What's driving your risk?</div>
+        <canvas id="driversBar" height="140"></canvas>
+      </div>
+    </div>
+
+    <!-- Tab: Recs -->
+    <div id="tab-recs" class="rtab-pane" style="display:none">
+
+      <!-- DOING WELL -->
+      <div class="recs-card recs-card-green">
+        <div class="recs-header">
+          <div class="recs-icon recs-icon-green">✅</div>
+          <div>
+            <div class="recs-title">What You're Doing Well</div>
+            <div class="recs-sub">Keep up these habits — they are protecting your heart</div>
+          </div>
+        </div>
+        <ul id="doing-well-list" class="recs-list recs-list-green"></ul>
+      </div>
+
+      <div style="height:1rem"></div>
+
+      <!-- AREAS FOR IMPROVEMENT -->
+      <div class="recs-card recs-card-yellow">
+        <div class="recs-header">
+          <div class="recs-icon recs-icon-yellow">📈</div>
+          <div>
+            <div class="recs-title">Areas for Improvement</div>
+            <div class="recs-sub">Evidence-based recommendations from AHA/ACC guidelines</div>
+          </div>
+        </div>
+        <ul id="recs-list" class="recs-list recs-list-yellow"></ul>
+      </div>
+
+      <div style="height:1rem"></div>
+
+      <!-- CRITICAL ACTIONS -->
+      <div class="recs-card recs-card-red">
+        <div class="recs-header">
+          <div class="recs-icon recs-icon-red">🚨</div>
+          <div>
+            <div class="recs-title">Critical Actions</div>
+            <div class="recs-sub">Priority steps — discuss these with your doctor</div>
+          </div>
+        </div>
+        <ul id="critical-list" class="recs-list recs-list-red"></ul>
+      </div>
+
+    </div>
+
+    <!-- Tab: Plan -->
+    <div id="tab-plan" class="rtab-pane" style="display:none">
+      <div class="plan-tier-label" id="plan-tier-label"></div>
+      <div class="roadmap" id="roadmap"></div>
+      <div class="callout-card">
+        <div class="callout-icon">🏆</div>
+        <div class="callout-body">
+          <div class="callout-title">People just like you have done it.</div>
+          <div class="callout-text">"Followed the 6-month plan and dropped from 12% → 7% — a 40% improvement." A 54-year-old male achieved this by hitting 9,000 steps/day, reducing sodium, and completing the cholesterol retest at month 6. <strong>Your goal is achievable.</strong></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════
+     SECTION 3 — DOCTORS
+════════════════════════════════════════════ -->
+<section id="doctors" class="section" aria-label="Find Doctors">
+  <div class="section-header">
+    <h2 class="sh-title">Find nearby doctors</h2>
+    <p class="sh-sub">Search hospitals, clinics & cardiologists within 5 km of your PIN code.</p>
+  </div>
+
+  <div class="search-bar">
+    <div class="sb-field">
+      <span class="sb-field-icon">⌖</span>
+      <input type="text" id="pincode" class="sb-input" placeholder="6-digit PIN code (e.g. 400001)" maxlength="6" aria-label="PIN code">
+    </div>
+    <select id="place-type" class="sb-select" aria-label="Type of place">
+      <option value="All">All types</option>
+      <option value="Hospital">Hospitals</option>
+      <option value="Clinic">Clinics</option>
+    </select>
+    <input type="text" id="specialty" class="sb-input" placeholder="Specialization (e.g. cardiologist)" aria-label="Specialization">
+    <button id="find-btn" class="find-btn" aria-label="Search for doctors">Search →</button>
+  </div>
+
+  <div id="doctor-status" class="doc-status" style="display:none" role="status" aria-live="polite"></div>
+
+  <div id="doctor-area" style="display:none">
+    <div id="doctor-map" class="doc-map" aria-label="Map of nearby doctors"></div>
+    <div id="doctor-list" class="doc-list"></div>
+  </div>
+
+  <!-- Register Your Hospital CTA -->
+ 
+
+<!-- ════════════════════════════════════════════
+     SECTION — HOSPITAL
+════════════════════════════════════════════ -->
+
+
+    <!-- Register Hospital -->
+    
+
+    <!-- Book Appointment -->
+    
+
+    <!-- View Appointments -->
+    <div class="form-card">
+      <div class="fc-title">Appointments</div>
+      <button onclick="viewAppointments()" class="find-btn">Load Appointments</button>
+      <div id="appointment-results"></div>
+    </div>
+
+  </div>
+</section>
+
+</main>
+
+<!-- ════════════════════════════════════════════
+     SIDEBAR CHAT — always visible, collapsible
+════════════════════════════════════════════ -->
+<aside class="chat-sidebar" id="chat-sidebar" aria-label="AI Chat Panel">
+  <!-- Toggle arrow -->
+  <button class="sidebar-toggle" id="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle chat sidebar" title="Toggle AI Chat">
+    <span class="toggle-arrow" id="toggle-arrow">›</span>
+  </button>
+
+  <div class="sidebar-inner" id="sidebar-inner">
+    <div class="chat-shell">
+      <div class="chat-header">
+        <div class="ch-left">
+          <div class="ch-dot"></div>
+          <span class="ch-label">CorVia AI · Gemini 2.5 Flash</span>
+        </div>
+        <button class="ch-clear" onclick="clearChat()" aria-label="Clear chat history">Clear</button>
+      </div>
+
+      <div class="chat-messages" id="chat-messages" aria-live="polite" aria-label="Chat messages">
+        <div class="chat-welcome" id="chat-welcome">
+          <div class="cw-pulse">
+            <div class="cwp-ring cwp-ring1"></div>
+            <div class="cwp-ring cwp-ring2"></div>
+            <div class="cw-icon" aria-hidden="true">🤖</div>
+          </div>
+          <div class="cw-title">CorVia AI ready</div>
+          <div class="cw-sub">Ask about your risk score, medications, diet, lifestyle, or anything cardiovascular.</div>
+          <div class="quick-grid">
+            <button class="qp" onclick="sendQuick('What does my risk score mean and what should I do?')">What does my score mean?</button>
+            <button class="qp" onclick="sendQuick('Give me a detailed 6-month plan to reduce my cardiovascular risk')">6-month action plan</button>
+            <button class="qp" onclick="sendQuick('How can I lower my cholesterol naturally?')">Lower cholesterol</button>
+            <button class="qp" onclick="sendQuick('What are the most impactful lifestyle changes for heart health?')">Best lifestyle changes</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-footer">
+        <input type="text" id="chat-input" class="chat-input" placeholder="Ask about heart health…" aria-label="Chat message input" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}">
+        <button class="chat-send-btn" onclick="sendChat()" aria-label="Send message">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</aside>
+
+</div><!-- /app-shell -->
+
+<!-- ── FOOTER ── -->
+<footer class="footer" role="contentinfo">
+  <div class="footer-ecg" aria-hidden="true">
+    <svg viewBox="0 0 600 20" fill="none">
+      <polyline points="0,10 60,10 70,10 75,2 80,18 85,10 140,10 150,10 155,2 160,18 165,10 220,10 230,10 235,2 240,18 245,10 300,10 310,10 315,2 320,18 325,10 380,10 390,10 395,2 400,18 405,10 460,10 470,10 475,2 480,18 485,10 540,10 600,10"
+        stroke="rgba(211,47,47,0.25)" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <div class="footer-content">
+    <span class="footer-brand">CorVia</span>
+    <span class="footer-sep">·</span>
+    <span>Every step counts · Small change today = big difference tomorrow</span>
+    <span class="footer-sep">·</span>
+    <span class="footer-disc">Educational use only · Not medical advice</span>
+  </div>
+</footer>
+
+<!-- ════════════════════════════════════════════
+     MODAL — Book Appointment (from doctor card)
+════════════════════════════════════════════ -->
+  
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>
