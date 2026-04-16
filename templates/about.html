@@ -569,6 +569,54 @@
             </div>
         </div>
     </section>
+    
+        <!-- ── CONTACT FOOTER STRIP ── -->
+    <div class="contact-strip">
+        <div class="contact-strip-inner">
+            <a href="mailto:corvia01@gmail.com" class="contact-item">📧 corvia01@gmail.com</a>
+            <span class="contact-divider">|</span>
+            <a href="tel:+919867716601" class="contact-item">📞 +91 9867716601</a>
+            <span class="contact-divider">|</span>
+            <span class="contact-item">📍 Mumbai, India</span>
+        </div>
+    </div>
+
+    <style>
+        .contact-strip {
+            background: #0f0404;
+            padding: 14px 5%;
+            margin: 0;
+        }
+        .contact-strip-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+        }
+        .contact-item {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.65);
+            font-family: 'DM Sans', sans-serif;
+            letter-spacing: 0.3px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .contact-item:hover {
+            color: #b22222;
+        }
+        .contact-divider {
+            color: rgba(178,34,34,0.45);
+            font-size: 1rem;
+        }
+        @media (max-width: 600px) {
+            .contact-strip-inner { gap: 12px; }
+            .contact-item { font-size: 0.78rem; }
+            .contact-divider { display: none; }
+        }
+    </style>
 
 </body>
 </html>
