@@ -22,8 +22,6 @@
 | **Hospital Locator** | Find nearby cardiology facilities using pincode search |
 | **Clinically Validated** | Independently reviewed by a practicing cardiologist |
 
----
-
 ## System Architecture
 
 | Component | Technology | Description |
