@@ -1,4 +1,4 @@
-# CORVIA - Heart Risk Prediction Platform
+# CORVIA - A Hybrid Machine Learning Framework for 10-Year ASCVD Risk Prediction Integrating ACC/AHA Pooled Cohort Equations with Wearable Physical Activity Data
 
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-1.7.5-orange)](https://xgboost.readthedocs.io/)
