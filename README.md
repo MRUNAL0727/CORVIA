@@ -93,7 +93,7 @@
 | `models/feature_columns.pkl` | Feature column names |
 | `models/label_encoder_sex.pkl` | Sex label encoder |
 | `data/users_data.csv` | Simulated dataset (50,000 profiles) |
-| `assets/FYP Logo.png` | CorVia logo |
+| `assets/FYP Logo.png` | CORVIA logo |
 | `eda_figures/` | EDA plots and figures |
 
 ## Tech Stack
